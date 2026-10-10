@@ -33,6 +33,7 @@ export function Header() {
   }, [menu]);
 
   return (
+    <>
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         scrolled || menu
@@ -50,27 +51,28 @@ export function Header() {
         <a
           href="#top"
           aria-label={`${clinic.fullName} — Consultant Implantologist & Smile Designer`}
-          className="group inline-flex min-h-[44px] items-center gap-3 transition-opacity hover:opacity-95"
+          className="group inline-flex min-h-[44px] shrink-0 items-center gap-3 transition-opacity hover:opacity-95"
         >
           <img
-            src="/dr-pinky.png"
-            alt={`${clinic.fullName}`}
-            className="h-11 sm:h-[54px] w-auto object-cover object-top select-none rounded transition-transform duration-500 group-hover:scale-[1.02]"
-            style={{ aspectRatio: '3/4', maxHeight: '54px' }}
+            src="/logo-icon.png"
+            alt=""
+            width={239}
+            height={192}
+            className="h-11 sm:h-[52px] w-auto object-contain select-none transition-transform duration-500 group-hover:scale-[1.04]"
           />
-          <div className="hidden sm:flex flex-col">
+          <div className="hidden sm:flex flex-col whitespace-nowrap">
             <span className="text-[16px] font-medium tracking-tight2 text-cream">{clinic.fullName}</span>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-gold-champagne">{clinic.title}</span>
           </div>
         </a>
 
-        <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-7 xl:gap-8">
-            {nav.map((n) => (
+        <nav aria-label="Primary" className="hidden xl:block">
+          <ul className="flex items-center gap-6 2xl:gap-8">
+            {nav.filter((n) => n.href !== "#booking").map((n) => (
               <li key={n.href}>
                 <a
                   href={n.href}
-                  className="group relative flex items-center gap-2 text-[14px] font-medium text-cream/80 transition-colors hover:text-gold-champagne"
+                  className="group relative flex items-center gap-2 whitespace-nowrap text-[14px] font-medium text-cream/80 transition-colors hover:text-gold-champagne"
                 >
                   <span
                     className="h-1.5 w-1.5 rounded-full bg-gold/50 transition-colors group-hover:bg-gold"
@@ -84,14 +86,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <BookButton className="hidden sm:inline-flex btn-primary !h-10 !px-4 !text-[13px] sm:!h-11 sm:!px-5 sm:!text-[14px]">
+          <BookButton className="btn-primary !h-10 !px-4 !text-[13px] sm:!h-11 sm:!px-5 sm:!text-[14px]">
             <MessageCircle size={16} aria-hidden />
-            Book Appointment
+            Book Now
           </BookButton>
 
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center border border-line-strong bg-surface/60 text-gold-champagne lg:hidden transition-colors hover:border-gold hover:text-cream"
+            className="grid h-11 w-11 place-items-center border border-line-strong bg-surface/60 text-gold-champagne xl:hidden transition-colors hover:border-gold hover:text-cream"
             aria-expanded={menu}
             aria-controls="mobile-menu"
             aria-label={menu ? "Close menu" : "Open menu"}
@@ -101,13 +103,14 @@ export function Header() {
           </button>
         </div>
       </div>
+    </header>
 
       <AnimatePresence>
         {menu && (
           <motion.nav
             id="mobile-menu"
             aria-label="Mobile"
-            className="fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-bg/95 backdrop-blur-2xl lg:hidden"
+            className="fixed inset-x-0 bottom-0 top-[var(--header-h)] z-[45] overflow-y-auto overflow-x-hidden bg-bg/95 backdrop-blur-2xl xl:hidden"
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -147,6 +150,6 @@ export function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
