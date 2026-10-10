@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu, MessageCircle, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BookButton } from "./booking";
-import { Logo } from "./Logo";
+import { clinic } from "@/lib/clinic.config";
 
 const nav = [
   { href: "#services", label: "Dental Services" },
@@ -36,8 +36,8 @@ export function Header() {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         scrolled || menu
-          ? "border-b border-line bg-bg/85 backdrop-blur-xl shadow-[0_10px_30px_rgba(38,8,47,0.7)]"
-          : "border-b border-transparent bg-transparent"
+          ? "border-b border-line bg-bg/90 backdrop-blur-xl shadow-[0_10px_30px_rgba(38,8,47,0.7)]"
+          : "border-b border-line/40 bg-bg/70 backdrop-blur-md"
       }`}
     >
       <a
@@ -47,7 +47,22 @@ export function Header() {
         Skip to content
       </a>
       <div className="wrap flex h-[var(--header-h)] items-center justify-between gap-4">
-        <Logo />
+        <a
+          href="#top"
+          aria-label={`${clinic.fullName} — Consultant Implantologist & Smile Designer`}
+          className="group inline-flex min-h-[44px] items-center gap-3 transition-opacity hover:opacity-95"
+        >
+          <img
+            src="/dr-pinky.png"
+            alt={`${clinic.fullName}`}
+            className="h-11 sm:h-[54px] w-auto object-cover object-top select-none rounded transition-transform duration-500 group-hover:scale-[1.02]"
+            style={{ aspectRatio: '3/4', maxHeight: '54px' }}
+          />
+          <div className="hidden sm:flex flex-col">
+            <span className="text-[16px] font-medium tracking-tight2 text-cream">{clinic.fullName}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-gold-champagne">{clinic.title}</span>
+          </div>
+        </a>
 
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-7 xl:gap-8">

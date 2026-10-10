@@ -4,7 +4,7 @@ import { CalendarDays, Clock, MapPin, MessageCircle, ShieldCheck } from "lucide-
 import { useId, useMemo, useState } from "react";
 import { clinic, treatments } from "@/lib/clinic.config";
 import { bookingMessage, openWhatsApp } from "@/lib/whatsapp";
-import { emptyForm, Form, nextDays, SLOTS, slotLabel, todayISO, validateBooking } from "./booking";
+import { emptyForm, Form, formatDateDisplay, nextDays, SLOTS, slotLabel, todayISO, validateBooking } from "./booking";
 
 export function BookingSection() {
   const [form, setForm] = useState<Form>(emptyForm);
@@ -213,10 +213,18 @@ export function BookingSection() {
 
                 {/* Date Picker Chips */}
                 <fieldset className="w-full" aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
-                  <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                    <CalendarDays size={14} className="text-gold" /> Preferred Appointment Date <span className="text-gold">*</span>
-                  </legend>
-                  <div className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                  <div className="flex items-center justify-between">
+                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                      <CalendarDays size={14} className="text-gold" /> Preferred Date <span className="text-gold">*</span>
+                    </legend>
+                    {form.date && (
+                      <span className="text-[11px] font-semibold text-gold-champagne">
+                        {formatDateDisplay(form.date)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] touch-pan-x overscroll-x-contain">
                     {days.map((d) => {
                       const on = form.date === d.iso;
                       return (
@@ -242,15 +250,28 @@ export function BookingSection() {
                       );
                     })}
                   </div>
-                  <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
-                    <span className="shrink-0 text-cream/80">Or pick date:</span>
+
+                  {/* Styled Custom Date Trigger - Eliminates iOS Blank Input Box */}
+                  <div className="relative mt-2">
+                    <div className="flex min-h-[44px] items-center justify-between border border-line-strong bg-surface/60 px-3.5 py-2.5 rounded-sm transition-colors hover:border-gold">
+                      <div className="flex items-center gap-2 text-[12px] sm:text-[13px] min-w-0">
+                        <CalendarDays size={15} className="text-gold shrink-0" />
+                        <span className={form.date ? "text-cream font-medium truncate" : "text-muted truncate"}>
+                          {form.date ? `Date: ${formatDateDisplay(form.date)}` : "Or pick specific date from calendar..."}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-gold-champagne shrink-0 ml-2">
+                        Select
+                      </span>
+                    </div>
                     <input
                       {...aria("date")}
-                      className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                       type="date"
                       min={todayISO()}
                       value={form.date}
                       onChange={set("date")}
+                      className="absolute inset-0 h-full w-full opacity-0 cursor-pointer [color-scheme:dark]"
+                      aria-label="Choose specific appointment date"
                     />
                   </div>
                   {err("date")}
@@ -258,9 +279,17 @@ export function BookingSection() {
 
                 {/* Time Slot Chips */}
                 <fieldset className="w-full" aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
-                  <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                    <Clock size={14} className="text-gold" /> Preferred Time Slot <span className="text-gold">*</span>
-                  </legend>
+                  <div className="flex items-center justify-between">
+                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                      <Clock size={14} className="text-gold" /> Preferred Time Slot <span className="text-gold">*</span>
+                    </legend>
+                    {form.time && (
+                      <span className="text-[11px] font-semibold text-gold-champagne">
+                        {slotLabel(form.time)}
+                      </span>
+                    )}
+                  </div>
+
                   <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
                     {SLOTS.map((t) => {
                       const on = form.time === t;
@@ -281,15 +310,28 @@ export function BookingSection() {
                       );
                     })}
                   </div>
-                  <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
-                    <span className="shrink-0 text-cream/80">Or custom time:</span>
+
+                  {/* Styled Custom Time Trigger - Eliminates iOS Blank Input Box */}
+                  <div className="relative mt-2">
+                    <div className="flex min-h-[44px] items-center justify-between border border-line-strong bg-surface/60 px-3.5 py-2.5 rounded-sm transition-colors hover:border-gold">
+                      <div className="flex items-center gap-2 text-[12px] sm:text-[13px] min-w-0">
+                        <Clock size={15} className="text-gold shrink-0" />
+                        <span className={form.time ? "text-cream font-medium truncate" : "text-muted truncate"}>
+                          {form.time ? `Time: ${slotLabel(form.time)}` : "Or set custom time..."}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-gold-champagne shrink-0 ml-2">
+                        Select
+                      </span>
+                    </div>
                     <input
                       {...aria("time")}
-                      className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                       type="time"
                       step={900}
                       value={form.time}
                       onChange={set("time")}
+                      className="absolute inset-0 h-full w-full opacity-0 cursor-pointer [color-scheme:dark]"
+                      aria-label="Choose custom appointment time"
                     />
                   </div>
                   {err("time")}

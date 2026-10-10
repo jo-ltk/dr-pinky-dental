@@ -117,11 +117,41 @@ export function nextDays(n: number) {
   return out;
 }
 
+export function formatDateDisplay(iso: string) {
+  if (!iso) return "";
+  try {
+    const parts = iso.split("-").map(Number);
+    if (parts.length !== 3) return iso;
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    const today = todayISO();
+    const tmrwDate = new Date();
+    tmrwDate.setDate(tmrwDate.getDate() + 1);
+    const tmrw = tmrwDate.toISOString().slice(0, 10);
+
+    const formatted = d.toLocaleDateString("en-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+
+    if (iso === today) return `Today · ${formatted}`;
+    if (iso === tmrw) return `Tomorrow · ${formatted}`;
+    return formatted;
+  } catch {
+    return iso;
+  }
+}
+
 export const SLOTS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30"];
 export const slotLabel = (t: string) => {
-  const [h, m] = t.split(":").map(Number);
-  const suffix = h >= 12 ? "PM" : "AM";
-  return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${suffix}`;
+  if (!t) return "";
+  try {
+    const [h, m] = t.split(":").map(Number);
+    const suffix = h >= 12 ? "PM" : "AM";
+    return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${suffix}`;
+  } catch {
+    return t;
+  }
 };
 
 export function BookingProvider({ children }: { children: React.ReactNode }) {
@@ -401,10 +431,19 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
 
                   {/* Preferred Appointment Date */}
                   <fieldset className="w-full" aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
-                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                      <CalendarDays size={14} className="text-gold" aria-hidden /> Preferred Appointment Date <span className="text-gold">*</span>
-                    </legend>
-                    <div className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                    <div className="flex items-center justify-between">
+                      <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                        <CalendarDays size={14} className="text-gold" aria-hidden /> Preferred Date <span className="text-gold">*</span>
+                      </legend>
+                      {form.date && (
+                        <span className="text-[11px] font-semibold text-gold-champagne">
+                          {formatDateDisplay(form.date)}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Quick Date Chips Carousel */}
+                    <div className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] touch-pan-x overscroll-x-contain">
                       {days.map((d) => {
                         const on = form.date === d.iso;
                         return (
@@ -431,15 +470,28 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
                         );
                       })}
                     </div>
-                    <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
-                      <span className="shrink-0 text-cream/80">Or pick date:</span>
+
+                    {/* Styled Custom Date Trigger - Fixes iOS Blank Input Box */}
+                    <div className="relative mt-2">
+                      <div className="flex min-h-[44px] items-center justify-between border border-line-strong bg-surface/60 px-3.5 py-2.5 rounded-sm transition-colors hover:border-gold">
+                        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] min-w-0">
+                          <CalendarDays size={15} className="text-gold shrink-0" />
+                          <span className={form.date ? "text-cream font-medium truncate" : "text-muted truncate"}>
+                            {form.date ? `Date: ${formatDateDisplay(form.date)}` : "Or pick specific date from calendar..."}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-gold-champagne shrink-0 ml-2">
+                          Select
+                        </span>
+                      </div>
                       <input
                         {...aria("date")}
-                        className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                         type="date"
                         min={todayISO()}
                         value={form.date}
                         onChange={set("date")}
+                        className="absolute inset-0 h-full w-full opacity-0 cursor-pointer [color-scheme:dark]"
+                        aria-label="Choose specific appointment date"
                       />
                     </div>
                     {err("date")}
@@ -447,9 +499,17 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
 
                   {/* Preferred Time Slot */}
                   <fieldset className="w-full" aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
-                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                      <Clock size={14} className="text-gold" aria-hidden /> Preferred Time Slot <span className="text-gold">*</span>
-                    </legend>
+                    <div className="flex items-center justify-between">
+                      <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                        <Clock size={14} className="text-gold" aria-hidden /> Preferred Time Slot <span className="text-gold">*</span>
+                      </legend>
+                      {form.time && (
+                        <span className="text-[11px] font-semibold text-gold-champagne">
+                          {slotLabel(form.time)}
+                        </span>
+                      )}
+                    </div>
+
                     <div className="mt-2 grid grid-cols-3 gap-2">
                       {SLOTS.map((t) => {
                         const on = form.time === t;
@@ -470,15 +530,28 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
                         );
                       })}
                     </div>
-                    <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
-                      <span className="shrink-0 text-cream/80">Or custom time:</span>
+
+                    {/* Styled Custom Time Trigger - Fixes iOS Blank Input Box */}
+                    <div className="relative mt-2">
+                      <div className="flex min-h-[44px] items-center justify-between border border-line-strong bg-surface/60 px-3.5 py-2.5 rounded-sm transition-colors hover:border-gold">
+                        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] min-w-0">
+                          <Clock size={15} className="text-gold shrink-0" />
+                          <span className={form.time ? "text-cream font-medium truncate" : "text-muted truncate"}>
+                            {form.time ? `Time: ${slotLabel(form.time)}` : "Or set custom time..."}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-gold-champagne shrink-0 ml-2">
+                          Select
+                        </span>
+                      </div>
                       <input
                         {...aria("time")}
-                        className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                         type="time"
                         step={900}
                         value={form.time}
                         onChange={set("time")}
+                        className="absolute inset-0 h-full w-full opacity-0 cursor-pointer [color-scheme:dark]"
+                        aria-label="Choose custom appointment time"
                       />
                     </div>
                     {err("time")}
