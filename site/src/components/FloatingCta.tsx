@@ -30,14 +30,12 @@ export function FloatingCta() {
         }`}
       >
         <BookButton
-          className="group flex h-14 items-center gap-3 border border-gold/40 bg-surface/90 pl-2.5 pr-6 text-[14px] font-semibold text-cream shadow-gold backdrop-blur-xl transition-all duration-300 hover:border-gold hover:shadow-gold-lg"
-          aria-label="Book on WhatsApp (+91 95629 80890)"
+          className="group flex h-14 items-center gap-3 border border-gold/40 bg-surface/90 px-6 text-[14px] font-semibold text-cream shadow-gold backdrop-blur-xl transition-all duration-300 hover:border-gold hover:shadow-gold-lg"
+          aria-label="Book Now (+91 95629 80890)"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-sm bg-white text-[#26082F] shadow-sm">
-            <MessageCircle size={20} strokeWidth={2.2} aria-hidden />
-          </span>
+          <MessageCircle size={20} className="text-gold shrink-0" aria-hidden />
           <div className="flex flex-col text-left">
-            <span className="text-[14px] leading-tight text-cream">Book on WhatsApp</span>
+            <span className="text-[14px] font-semibold leading-tight text-cream">Book Now</span>
             <span className="text-[11px] font-normal text-gold-champagne font-mono">+91 95629 80890</span>
           </div>
         </BookButton>
@@ -51,10 +49,8 @@ export function FloatingCta() {
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       >
         <BookButton className="btn-primary h-13 sm:h-14 w-full text-[15px] sm:text-[16px] flex items-center justify-center gap-2">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-sm bg-white text-[#26082F]">
-            <MessageCircle size={16} strokeWidth={2.4} aria-hidden />
-          </span>
-          Book on WhatsApp
+          <MessageCircle size={19} aria-hidden />
+          Book Now
         </BookButton>
       </div>
     </>

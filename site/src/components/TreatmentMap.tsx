@@ -145,12 +145,9 @@ export function TreatmentMap() {
               href={whatsappUrl(enquiryMessage(cat.name))}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary mt-6 w-full sm:w-auto text-[14px] sm:text-[15px] flex items-center justify-center gap-2.5"
+              className="btn-primary mt-6 w-full sm:w-auto text-[14px] sm:text-[15px] flex items-center justify-center gap-2"
             >
-              <span className="grid h-6 w-6 place-items-center rounded-sm bg-white text-[#26082F]">
-                <MessageCircle size={15} aria-hidden />
-              </span>
-              Enquire about {cat.name} on WhatsApp
+              <MessageCircle size={18} aria-hidden /> Book Now
             </a>
             <p className="mt-4 text-[11px] leading-relaxed text-muted/70 border-t border-line/40 pt-3">
               * Illustration only. Not a diagnosis. Specific clinical recommendations are provided following an in-person examination by Dr. Pinky Varghese.

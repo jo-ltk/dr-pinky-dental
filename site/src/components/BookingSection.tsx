@@ -350,7 +350,7 @@ export function BookingSection() {
                     type="submit"
                     className="btn-primary h-[52px] sm:h-14 w-full text-[16px] flex items-center justify-center gap-2"
                   >
-                    <MessageCircle size={19} aria-hidden /> Book on WhatsApp
+                    <MessageCircle size={19} aria-hidden /> Book Now
                   </button>
                   <p className="mt-3 text-center text-[12px] leading-snug text-muted break-words" aria-live="polite">
                     {sent
