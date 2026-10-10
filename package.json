@@ -1,0 +1,10 @@
+{
+  "name": "dr-pinky-dental",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix site",
+    "build": "npm run build --prefix site",
+    "start": "npm run start --prefix site"
+  }
+}
