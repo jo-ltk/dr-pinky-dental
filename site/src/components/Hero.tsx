@@ -70,11 +70,6 @@ export function Hero() {
           Book Appointment
           <ArrowRight size={18} aria-hidden className="ml-1" />
         </BookButton>
-
-        <a href="#services" className="link-arrow text-[15px]">
-          Explore Treatments
-          <ArrowRight size={16} aria-hidden />
-        </a>
       </div>
 
       {/* ── Feature strip: 3 cards with dividers ── */}
