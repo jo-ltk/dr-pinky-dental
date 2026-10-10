@@ -1,105 +1,149 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
-const ToothScene = dynamic(() => import("./three/ToothScene"), { ssr: false });
-
-function hasWebGL() {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 /**
- * The hero centerpiece. A pre-rendered image of the same 3D model shows first
- * (and stays if WebGL is unavailable); the live Three.js scene fades in over it
- * with cinematic subtle gold lighting.
+ * HeroVisual — interactive implant showcase.
+ *
+ * Animations:
+ *  • Entrance: scale-up + fade in on mount
+ *  • Idle: gentle vertical float (CSS keyframe)
+ *  • Mouse parallax: the implant tilts 3D toward the cursor
+ *  • Cursor glow: a radial gold spotlight follows the mouse inside the card
+ *  • Hover lift: slight upward translate + stronger drop-shadow
+ *  • Reduced-motion: all animations disabled cleanly
  */
 export function HeroVisual({
-  variant = "implant",
   className = "",
-  camZ = 10,
-  poster = "/renders/implant.webp",
+  poster = "/renders/implant-hero.png",
 }: {
-  variant?: "implant" | "tooth";
   className?: string;
-  camZ?: number;
   poster?: string;
 }) {
-  const box = useRef<HTMLDivElement>(null);
-  const [live, setLive] = useState(false);
-  const [ready, setReady] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const [glow, setGlow] = useState({ x: 50, y: 50, opacity: 0 });
+  const [entered, setEntered] = useState(false);
   const [reduce, setReduce] = useState(false);
-  const [visible, setVisible] = useState(true);
 
+  // Detect reduced-motion preference
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduce(mq.matches);
-    const on = () => setReduce(mq.matches);
-    mq.addEventListener("change", on);
-
-    const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
-    const lowEnd = nav.connection?.saveData || (nav.deviceMemory !== undefined && nav.deviceMemory < 2);
-    const start = () => !lowEnd && hasWebGL() && setLive(true);
-    const id = "requestIdleCallback" in window ? (window as any).requestIdleCallback(start, { timeout: 1200 }) : setTimeout(start, 400);
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "100px" });
-    if (box.current) io.observe(box.current);
-
-    return () => {
-      mq.removeEventListener("change", on);
-      io.disconnect();
-      if ("cancelIdleCallback" in window) (window as any).cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
+    const onChange = () => setReduce(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // Entrance animation trigger (slight delay so page paints first)
+  useEffect(() => {
+    const id = setTimeout(() => setEntered(true), 80);
+    return () => clearTimeout(id);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduce || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) / rect.width;  // 0–1
+    const cy = (e.clientY - rect.top) / rect.height;  // 0–1
+    // Tilt: ±12 deg
+    setTilt({ rx: (cy - 0.5) * -24, ry: (cx - 0.5) * 24 });
+    // Glow follows cursor
+    setGlow({ x: cx * 100, y: cy * 100, opacity: 1 });
+  };
+
+  const handleMouseLeave = () => {
+    // Smooth spring back
+    setTilt({ rx: 0, ry: 0 });
+    setGlow(prev => ({ ...prev, opacity: 0 }));
+  };
+
   return (
-    <div ref={box} className={`relative overflow-hidden ${className}`} aria-hidden="true">
-      {/* Warm champagne gold and royal purple volumetric ambient glow */}
-      <div className="ambient pointer-events-none absolute left-1/2 top-[40%] h-[74%] w-[94%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(212,175,106,0.28),rgba(81,20,95,0.32)_55%,transparent)] blur-2xl" />
-      <div className="pointer-events-none absolute bottom-[3%] left-1/2 h-[6%] w-[36%] -translate-x-1/2 rounded-[50%] bg-[#120217]/85 blur-xl" />
-
-      {/* Poster / static fallback render */}
+    <div
+      ref={cardRef}
+      className={`select-none ${className}`}
+      style={{ perspective: "900px" }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* 3-D tilt wrapper */}
       <div
-        className={`absolute left-1/2 top-[48%] h-[88%] -translate-x-1/2 -translate-y-1/2 transition-opacity duration-1000 ${
-          ready ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
+        style={{
+          transformStyle: "preserve-3d",
+          transform: reduce
+            ? "none"
+            : `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+          transition: "transform 0.18s cubic-bezier(0.2,0.7,0.2,1)",
+          willChange: "transform",
+        }}
+        className="relative h-full w-full"
       >
-        <img
-          src={poster}
-          alt="Dental Implant 3D Model"
-          width={475}
-          height={1270}
-          fetchPriority="high"
-          className="float-y h-full w-auto max-w-none object-contain drop-shadow-[0_25px_50px_rgba(212,175,106,0.3)]"
-          style={{ animationPlayState: reduce ? "paused" : undefined }}
-        />
-      </div>
-
-      {live && (
+        {/* Ambient purple glow behind */}
         <div
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            ready ? "opacity-100" : "opacity-0"
-          }`}
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 55%, rgba(81,20,95,0.55), transparent 75%)",
+          }}
+        />
+
+        {/* Ground shadow */}
+        <div
+          className="pointer-events-none absolute bottom-[2%] left-1/2 -translate-x-1/2 rounded-[50%]"
+          style={{
+            width: "46%",
+            height: "5%",
+            background: "rgba(18,2,23,0.7)",
+            filter: "blur(14px)",
+          }}
+        />
+
+        {/* Cursor spotlight (moves with mouse) */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden"
+          style={{
+            background: `radial-gradient(circle 180px at ${glow.x}% ${glow.y}%, rgba(212,175,106,0.22), transparent 70%)`,
+            opacity: glow.opacity,
+            transition: "opacity 0.3s ease",
+          }}
+        />
+
+        {/* The implant PNG */}
+        <div
+          className="relative flex h-full w-full items-center justify-center"
+          style={{
+            // Entrance: scale + fade
+            opacity: entered ? 1 : 0,
+            transform: entered ? "scale(1)" : "scale(0.88)",
+            transition: reduce
+              ? "none"
+              : "opacity 0.9s cubic-bezier(0.2,0.7,0.2,1), transform 1s cubic-bezier(0.2,0.7,0.2,1)",
+          }}
         >
-          <ToothScene
-            variant={variant}
-            animate={!reduce}
-            interactive={!reduce}
-            paused={!visible}
-            camZ={camZ}
-            onFirstFrame={() => setReady(true)}
-            onSlow={() => {
-              setReady(false);
-              setLive(false);
+          <img
+            src={poster}
+            alt="Dental Implant"
+            draggable={false}
+            fetchPriority="high"
+            className="max-h-full w-auto max-w-full object-contain"
+            style={{
+              // float-y is defined in globals.css
+              animation: reduce ? "none" : "floatY 7s ease-in-out infinite",
+              filter:
+                "drop-shadow(0 28px 48px rgba(212,175,106,0.35)) drop-shadow(0 6px 18px rgba(18,2,23,0.6))",
+              willChange: "transform",
             }}
           />
         </div>
-      )}
+
+        {/* Subtle rim highlight edge */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{
+            boxShadow: "inset 0 0 0 1px rgba(212,175,106,0.12)",
+          }}
+        />
+      </div>
     </div>
   );
 }

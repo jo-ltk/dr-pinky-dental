@@ -11,7 +11,7 @@ export function FinalCta() {
 
       {/* Decorative 3D visual silhouette */}
       <div className="pointer-events-none absolute right-[-6%] top-1/2 -z-10 h-[92%] -translate-y-1/2 rotate-[12deg] opacity-35 sm:right-[8%] sm:opacity-75" aria-hidden>
-        <img src="/renders/implant.webp" alt="" loading="lazy" className="float-y h-full w-auto max-w-none drop-shadow-[0_20px_40px_rgba(212,175,106,0.3)]" />
+        <img src="/renders/implant-hero.png" alt="" loading="lazy" className="float-y h-full w-auto max-w-none drop-shadow-[0_20px_40px_rgba(212,175,106,0.3)]" />
       </div>
 
       <div className="wrap relative">

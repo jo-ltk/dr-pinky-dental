@@ -4,55 +4,58 @@ import { BookButton } from "./booking";
 
 export function DoctorProfile() {
   return (
-    <section id="doctor" className="relative border-t border-line bg-surface/40 py-24 sm:py-32" aria-labelledby="doctor-title">
+    <section id="doctor" className="relative border-t border-gold/20 py-24 sm:py-32" style={{ background: "linear-gradient(160deg, #2a1000 0%, #1a0800 100%)" }} aria-labelledby="doctor-title">
       <div className="wrap">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-          {/* Left Column: Official Doctor Monogram & Emblem Presentation */}
+          {/* Left Column: Full-bleed doctor portrait card */}
           <div className="lg:col-span-5" data-reveal>
-            <div className="relative mx-auto max-w-[420px] overflow-hidden border border-line bg-gradient-to-b from-royal/50 via-surface/80 to-bg p-8 sm:p-10 shadow-royal">
-              {/* Gold decorative borders and accents */}
-              <div className="absolute left-3 top-3 h-4 w-4 border-l border-t border-gold/60" />
-              <div className="absolute right-3 top-3 h-4 w-4 border-r border-t border-gold/60" />
-              <div className="absolute bottom-3 left-3 h-4 w-4 border-b border-l border-gold/60" />
-              <div className="absolute bottom-3 right-3 h-4 w-4 border-b border-r border-gold/60" />
+            <div className="relative mx-auto max-w-[420px] overflow-hidden border border-[#9C6B32]/50 shadow-gold" style={{ aspectRatio: "3/4" }}>
+              {/* Gold corner accents */}
+              <div className="absolute left-3 top-3 z-20 h-4 w-4 border-l border-t border-[#9C6B32]" />
+              <div className="absolute right-3 top-3 z-20 h-4 w-4 border-r border-t border-[#9C6B32]" />
+              <div className="absolute bottom-3 left-3 z-20 h-4 w-4 border-b border-l border-[#9C6B32]" />
+              <div className="absolute bottom-3 right-3 z-20 h-4 w-4 border-b border-r border-[#9C6B32]" />
 
-              <div className="flex flex-col items-center text-center">
-                {/* Official Monogram */}
-                <div className="relative mb-6 flex h-36 w-36 items-center justify-center rounded-full border border-gold/40 bg-bg/80 p-4 shadow-gold">
-                  <img
-                    src="/logo.png"
-                    alt={`${doctorProfile.name} Monogram`}
-                    className="h-28 w-28 object-contain"
-                  />
-                </div>
+              {/* Full-bleed photo */}
+              <img
+                src="/dr-pinky-photo.png"
+                alt={doctorProfile.name}
+                className="absolute inset-0 h-full w-full object-cover object-top"
+              />
 
-                <span className="rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
+              {/* Gradient overlay — fades photo into gold at bottom */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: "linear-gradient(to bottom, transparent 30%, rgba(156,107,50,0.75) 58%, rgba(120,72,10,0.97) 100%)",
+                }}
+              />
+
+              {/* Text + CTA overlaid at bottom */}
+              <div className="absolute inset-x-0 bottom-0 z-10 px-7 pb-8">
+                <span className="inline-block rounded-full border border-[#9C6B32]/60 bg-[#F5DDA5]/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#26082F]">
                   {doctorProfile.qualifications}
                 </span>
 
-                <h3 className="mt-4 text-[26px] font-light tracking-tight text-cream">
+                <h3 className="mt-3 text-[24px] font-light tracking-tight text-[#26082F]">
                   {doctorProfile.name}
                 </h3>
 
-                <p className="mt-1 text-[13px] font-medium tracking-wide text-gold">
+                <p className="mt-0.5 text-[13px] font-semibold tracking-wide text-[#26082F]/80">
                   {doctorProfile.role}
                 </p>
 
-                <p className="mt-4 text-[14px] leading-[1.6] text-muted">
-                  {doctorProfile.experienceSummary}
-                </p>
-
-                {/* Consultation Locations Strip */}
-                <div className="mt-6 w-full border-t border-line/60 pt-4 text-left">
-                  <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
-                    <MapPin size={13} className="text-gold" /> Consultation Centres:
+                {/* Consultation Locations */}
+                <div className="mt-4 border-t border-[#9C6B32]/40 pt-3">
+                  <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#26082F]">
+                    <MapPin size={12} /> Consultation Centres
                   </p>
-                  <p className="mt-1 text-[13px] text-cream/90">
+                  <p className="mt-1 text-[12px] text-[#26082F]/80">
                     {doctorProfile.locations.join(" · ")}
                   </p>
                 </div>
 
-                <div className="mt-6 w-full">
+                <div className="mt-5">
                   <BookButton
                     treatment="Consultation with Dr. Pinky Varghese"
                     className="btn-primary w-full text-[14px]"

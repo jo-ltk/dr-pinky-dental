@@ -1,170 +1,172 @@
 "use client";
 
-import { ArrowDownRight, ArrowRight, MapPin, MessageCircle, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
-import { clinic, doctorProfile } from "@/lib/clinic.config";
+import { useEffect, useRef, useState } from "react";
+import { MessageCircle, Sparkles } from "lucide-react";
 import { BookButton } from "./booking";
-import { HeroVisual } from "./HeroVisual";
-
-function LocalTime() {
-  const [t, setT] = useState("");
-  useEffect(() => {
-    const f = () =>
-      setT(
-        new Date().toLocaleTimeString("en-GB", {
-          timeZone: "Asia/Kolkata",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }) + " IST"
-      );
-    f();
-    const id = setInterval(f, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return <span suppressHydrationWarning className="tabular-nums font-mono text-gold-champagne">{t || "—"}</span>;
-}
 
 export function Hero() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const [glow, setGlow] = useState({ x: 50, y: 40, opacity: 0 });
+  const [entered, setEntered] = useState(false);
+  const [reduce, setReduce] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduce(mq.matches);
+    const onChange = () => setReduce(mq.matches);
+    mq.addEventListener("change", onChange);
+    const id = setTimeout(() => setEntered(true), 60);
+    return () => { mq.removeEventListener("change", onChange); clearTimeout(id); };
+  }, []);
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduce || !cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    const cx = (e.clientX - r.left) / r.width;
+    const cy = (e.clientY - r.top) / r.height;
+    setTilt({ rx: (cy - 0.5) * -12, ry: (cx - 0.5) * 12 });
+    setGlow({ x: cx * 100, y: cy * 100, opacity: 1 });
+  };
+
+  const onLeave = () => {
+    setTilt({ rx: 0, ry: 0 });
+    setGlow(g => ({ ...g, opacity: 0 }));
+  };
+
   return (
-    <section id="top" className="grain relative isolate min-h-[100svh] overflow-hidden pt-[var(--header-h)]">
-      {/* Cinematic luxury background: deep plum #26082F → primary purple #3B1048 → royal purple #51145F */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_60%_35%,#3B1048_0%,#2B0A35_45%,#26082F_100%)]" />
-      <div className="ambient absolute -right-[12%] top-[-15%] -z-10 h-[70vh] w-[55vw] rounded-full bg-[radial-gradient(closest-side,rgba(212,175,106,0.16),transparent)] blur-3xl" />
-      <div className="ambient absolute -left-[10%] bottom-[10%] -z-10 h-[50vh] w-[45vw] rounded-full bg-[radial-gradient(closest-side,rgba(81,20,95,0.35),transparent)] blur-3xl" />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-1/3 bg-gradient-to-t from-bg to-transparent" />
+    <section
+      id="top"
+      className="grain relative isolate flex min-h-[100svh] items-center justify-center pt-[var(--header-h)]"
+    >
+      {/* Deep plum page background — matches site theme */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_100%_at_50%_40%,#3B1048_0%,#2B0A35_50%,#26082F_100%)]" />
 
-      <div className="wrap relative grid min-h-[calc(100svh-var(--header-h))] grid-cols-1 lg:grid-cols-12">
-        {/* 3D Hero Piece: centre-right on desktop, top on mobile */}
-        <HeroVisual className="order-1 -mx-5 h-[36svh] min-h-[260px] max-h-[420px] sm:h-[50svh] sm:max-h-none lg:absolute lg:inset-y-0 lg:left-[40%] lg:mx-0 lg:h-auto lg:w-[36%] lg:min-h-0" />
+      {/* Ambient gold glow drifting behind card */}
+      <div className="ambient pointer-events-none absolute left-1/2 top-[40%] -z-10 h-[70vh] w-[70vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(212,175,106,0.13),transparent)] blur-3xl" />
+      <div className="ambient pointer-events-none absolute left-[30%] top-[60%] -z-10 h-[50vh] w-[50vw] rounded-full bg-[radial-gradient(closest-side,rgba(81,20,95,0.4),transparent)] blur-3xl" style={{ animationDelay: "4s" }} />
 
-        {/* Left Column: editorial headline & doctor credentials */}
-        <div className="relative z-10 order-2 flex flex-col justify-start pb-8 sm:justify-center lg:col-span-7 lg:order-none lg:pb-24 lg:pt-6">
-          {/* Doctor Badge */}
-          <div className="enter inline-flex items-center gap-2 self-start rounded-full border border-line bg-surface/70 px-3.5 py-1.5 backdrop-blur-md" style={{ ["--d" as string]: 0 }}>
-            <Sparkles size={13} className="text-gold" aria-hidden />
-            <span className="text-[11px] font-semibold tracking-wide text-gold-champagne">
-              Dr. Pinky Varghese · MDS (Prosthodontics)
-            </span>
-          </div>
+      {/* ── Card ── */}
+      <div
+        className="relative mx-auto w-full sm:w-[min(70vw,420px)] lg:w-[min(36vw,440px)]"
+        style={{ perspective: "1000px" }}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+      >
+        <div
+          ref={cardRef}
+          className="relative overflow-hidden sm:rounded-3xl"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: reduce ? "none" : `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
+            opacity: entered ? 1 : 0,
+            scale: entered ? "1" : "0.92",
+            transitionProperty: reduce ? "none" : "transform, opacity, scale",
+            transitionDuration: "0.2s, 0.85s, 0.85s",
+            transitionTimingFunction: "cubic-bezier(0.2,0.7,0.2,1)",
+            willChange: "transform",
+          }}
+        >
+          {/* Card background — site purple palette */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: "linear-gradient(175deg, #51145F 0%, #3B1048 40%, #26082F 100%)",
+            }}
+          />
 
-          <h1 className="mt-3 text-[clamp(44px,7.2vw,118px)] font-light leading-[0.96] sm:mt-5 tracking-hero lg:mt-6 text-cream">
-            <span className="enter block text-gold-champagne font-light" style={{ ["--d" as string]: 1 }}>
-              Modern Care
-            </span>
-            <span className="enter block" style={{ ["--d" as string]: 2 }}>
-              <span className="text-gold font-light">for a</span> Perfect
-            </span>
-            <span className="enter block" style={{ ["--d" as string]: 3 }}>
-              Smile.
-            </span>
-          </h1>
+          {/* Cursor gold spotlight */}
+          <div
+            className="pointer-events-none absolute inset-0 z-10"
+            style={{
+              background: `radial-gradient(circle 220px at ${glow.x}% ${glow.y}%, rgba(212,175,106,0.18), transparent 65%)`,
+              opacity: glow.opacity,
+              transition: "opacity 0.3s ease",
+            }}
+          />
 
-          <p className="enter mt-3 text-[14px] font-medium tracking-wide text-gold sm:text-[15px]" style={{ ["--d" as string]: 4 }}>
-            {clinic.title}
-          </p>
-
-          <p className="enter mt-3 max-w-[460px] text-[15px] leading-[1.6] text-muted sm:mt-4 sm:text-[16px]" style={{ ["--d" as string]: 5 }}>
-            Advanced dental implants, architectural smile designing, and comprehensive prosthodontic restorations crafted with surgical precision and artistic care.
-          </p>
-
-          {/* Consultation centers badge */}
-          <div className="enter mt-4 flex flex-wrap items-center gap-2 text-[12px] text-cream/90 sm:mt-5" style={{ ["--d" as string]: 6 }}>
-            <span className="flex items-center gap-1 font-semibold text-gold-champagne">
-              <MapPin size={13} className="text-gold" /> Consultation Centres:
-            </span>
-            <span className="text-muted">Ernakulam · Aluva · Kakkanad · Angamaly</span>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="enter mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-5" style={{ ["--d" as string]: 7 }}>
-            <BookButton className="btn-primary h-14 w-full text-[16px] sm:h-[52px] sm:w-auto sm:text-[15px]">
-              <MessageCircle size={18} aria-hidden /> Book Your Appointment
-            </BookButton>
-            <a href="#services" className="link-arrow min-h-[44px] self-center py-2 text-[15px] sm:self-auto">
-              Explore Treatments <ArrowRight size={16} aria-hidden />
-            </a>
-          </div>
-
-          <p className="enter mt-5 text-center text-[12px] font-medium text-muted sm:mt-7 sm:text-left" style={{ ["--d" as string]: 8 }}>
-            WhatsApp Direct: <a href="https://wa.me/919562980890" target="_blank" rel="noopener noreferrer" className="text-gold-champagne hover:underline font-semibold">+91 95629 80890</a> · Fast Reply
-          </p>
-
-          {/* Mobile Doctor Profile - visible only on mobile/tablet */}
-          <a
-            href="#doctor"
-            className="enter group mt-6 flex items-center gap-4 border border-line bg-surface/40 p-3 backdrop-blur-sm transition-colors hover:border-gold lg:hidden"
-            style={{ ["--d" as string]: 9 }}
+          {/* ── Implant image — bleeds above card top ── */}
+          <div
+            className="relative flex justify-center overflow-visible"
+            style={{ height: "clamp(240px, 42vh, 420px)" }}
           >
-            <div className="relative h-[72px] w-[56px] shrink-0 overflow-hidden border border-line">
-              <img
-                src="/dr-pinky-photo.png"
-                alt="Dr. Pinky Varghese"
-                className="h-full w-full object-cover object-top"
-              />
+            <img
+              src="/renders/implant-hero.png"
+              alt="Dental Implant"
+              draggable={false}
+              fetchPriority="high"
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-auto select-none object-contain"
+              style={{
+                height: "128%",
+                maxWidth: "none",
+                animation: reduce ? "none" : "floatY 7s ease-in-out infinite",
+                filter:
+                  "drop-shadow(0 24px 48px rgba(212,175,106,0.25)) drop-shadow(0 8px 20px rgba(18,2,23,0.7))",
+                willChange: "transform",
+              }}
+            />
+
+            {/* Fade image into text section */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5"
+              style={{
+                background:
+                  "linear-gradient(to bottom, transparent, rgba(45,8,60,0.85) 65%, #2d083c 100%)",
+              }}
+            />
+          </div>
+
+          {/* ── Text + buttons ── */}
+          <div
+            className="relative z-10 px-7 pb-6 pt-3"
+            style={{
+              background:
+                "linear-gradient(to bottom, #2d083c 0%, #26082F 100%)",
+            }}
+          >
+            {/* Specialist pill */}
+            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-[rgba(212,175,106,0.3)] bg-[rgba(81,20,95,0.6)] px-3 py-1 backdrop-blur-sm">
+              <Sparkles size={11} className="text-gold" aria-hidden />
+              <span className="text-[10px] font-semibold tracking-wide text-gold-champagne">
+                Dr. Pinky Varghese · MDS Prosthodontics
+              </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gold-champagne">Specialist In Charge</p>
-              <p className="text-[15px] font-light text-cream leading-snug">Dr. Pinky Varghese</p>
-              <p className="text-[11px] font-semibold text-gold">MDS · Prosthodontics</p>
+
+            {/* Headline */}
+            <h1
+              className="text-[clamp(36px,10vw,66px)] font-light leading-[1.05] text-cream"
+              style={{ letterSpacing: "-0.02em" }}
+            >
+              Modern Care for a<br />
+              <span className="text-gold font-light italic">Perfect</span>
+              {" "}Smile.
+            </h1>
+
+            {/* Buttons */}
+            <div className="mt-5 flex flex-col gap-3">
+              {/* Primary — gold CTA */}
+              <BookButton className="btn-primary flex w-full items-center justify-center gap-2 py-4 text-[15px]">
+                <MessageCircle size={17} aria-hidden />
+                Book Appointment
+              </BookButton>
             </div>
-            <ArrowDownRight size={18} className="shrink-0 text-gold transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" aria-hidden />
-          </a>
+          </div>
+
+          {/* Gold rim border */}
+          <div
+            className="pointer-events-none absolute inset-0 sm:rounded-3xl"
+            style={{ boxShadow: "inset 0 0 0 1px rgba(212,175,106,0.18)" }}
+          />
         </div>
 
-        {/* Right column: Doctor summary showcase */}
-        <aside className="relative z-10 hidden flex-col justify-between border-l border-line pb-24 pl-8 pt-10 lg:col-span-3 lg:col-start-10 lg:flex">
-          <div className="enter-fade space-y-3">
-            <p className="label">Specialist In Charge</p>
-            <p className="max-w-[240px] text-[18px] font-light leading-[1.35] text-cream">
-              {doctorProfile.name}
-            </p>
-            <p className="text-[12px] font-semibold text-gold-champagne uppercase tracking-wider">
-              {doctorProfile.qualifications}
-            </p>
-            <p className="text-[13px] leading-[1.6] text-muted">
-              {doctorProfile.role}
-            </p>
-          </div>
-
-          <a href="#doctor" className="enter-fade group block">
-            <span className="mb-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-label text-gold-champagne">
-              Doctor Profile <ArrowDownRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5 text-gold" aria-hidden />
-            </span>
-            <div className="relative aspect-[4/5] w-full max-w-[210px] overflow-hidden border border-line bg-gradient-to-b from-royal/60 to-bg transition-colors group-hover:border-gold">
-              <img
-                src="/dr-pinky-photo.png"
-                alt="Dr. Pinky Varghese – Prosthodontist"
-                className="h-full w-full object-cover object-top"
-              />
-              <div className="absolute bottom-0 inset-x-0 border-t border-line/60 bg-bg/80 backdrop-blur-sm px-2 py-1.5 text-[11px] text-muted">
-                4 Consultation Locations
-              </div>
-            </div>
-          </a>
-        </aside>
-      </div>
-
-      {/* Bottom Trust Strip */}
-      <div className="relative z-10 border-t border-line bg-bg/60 backdrop-blur-sm">
-        <div className="wrap grid grid-cols-2 gap-y-4 py-4 text-[12px] leading-[1.45] text-cream/90 sm:grid-cols-4">
-          <div>
-            <span className="font-semibold text-gold-champagne">Prosthodontics & Implants</span>
-            <p className="text-muted">Specialist MDS Consultation</p>
-          </div>
-          <div>
-            <span className="font-semibold text-gold-champagne">Ernakulam District</span>
-            <p><LocalTime /></p>
-          </div>
-          <div className="hidden sm:block">
-            <span className="font-semibold text-gold-champagne">WhatsApp Booking</span>
-            <p className="text-muted">+91 95629 80890</p>
-          </div>
-          <div className="hidden text-right sm:block">
-            <span className="font-semibold text-gold-champagne">4 Centres Available</span>
-            <p className="text-muted">Ernakulam · Aluva · Kakkanad · Angamaly</p>
-          </div>
-        </div>
+        {/* Card outer glow */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 rounded-3xl"
+          style={{
+            boxShadow:
+              "0 40px 100px -20px rgba(0,0,0,0.75), 0 0 70px -10px rgba(212,175,106,0.15)",
+          }}
+        />
       </div>
     </section>
   );

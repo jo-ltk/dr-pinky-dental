@@ -3,7 +3,7 @@ import { treatments } from "@/lib/clinic.config";
 import { enquiryMessage, whatsappUrl } from "@/lib/whatsapp";
 
 const visuals: Record<string, { src: string; cls: string }> = {
-  implants: { src: "/renders/implant.webp", cls: "h-[116%] -bottom-[10%] rotate-[8deg]" },
+  implants: { src: "/renders/implant-hero.png", cls: "h-[116%] -bottom-[10%] rotate-[8deg]" },
   "smile-design": { src: "/renders/crown.webp", cls: "h-[76%] top-[12%] rotate-[5deg]" },
   cosmetic: { src: "/renders/aligner.webp", cls: "h-[84%] top-[8%] -scale-x-100 rotate-[-6deg]" },
   whitening: { src: "/renders/crown.webp", cls: "h-[74%] top-[13%]" },
