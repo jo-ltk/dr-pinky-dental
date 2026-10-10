@@ -41,7 +41,7 @@ export function FinalCta() {
 
         <div className="mt-9 flex flex-col sm:flex-row sm:items-center gap-4" data-reveal style={{ ["--d" as string]: 3 }}>
           <BookButton className="btn-primary w-full sm:w-auto text-[16px] px-8 py-4">
-            <MessageCircle size={19} aria-hidden /> Book Now
+            <MessageCircle size={19} aria-hidden /> Book Consultation
           </BookButton>
           <a
             href="https://wa.me/919562980890"

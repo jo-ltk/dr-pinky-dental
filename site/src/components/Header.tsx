@@ -86,9 +86,9 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <BookButton className="btn-primary !h-10 !px-4 !text-[13px] sm:!h-11 sm:!px-5 sm:!text-[14px]">
+          <BookButton className="hidden sm:inline-flex btn-primary !h-10 !px-4 !text-[13px] sm:!h-11 sm:!px-5 sm:!text-[14px]">
             <MessageCircle size={16} aria-hidden />
-            Book Now
+            Book Consultation
           </BookButton>
 
           <button
@@ -141,7 +141,7 @@ export function Header() {
 
             <div className="wrap relative pb-28 pt-8">
               <BookButton className="btn-primary w-full" onClickCapture={() => setMenu(false)}>
-                <MessageCircle size={18} aria-hidden /> Book Now
+                <MessageCircle size={18} aria-hidden /> Book Consultation
               </BookButton>
               <p className="mt-4 text-center text-[12px] text-muted">
                 Consultations in Ernakulam · Aluva · Kakkanad · Angamaly

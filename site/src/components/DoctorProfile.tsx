@@ -31,8 +31,8 @@ export function DoctorProfile() {
                 }}
               />
 
-              {/* Text + CTA overlaid at bottom */}
-              <div className="absolute inset-x-0 bottom-0 z-10 px-7 pb-8">
+              {/* Text overlaid at bottom */}
+              <div className="absolute inset-x-0 bottom-0 z-10 px-7 pb-6">
                 <span className="inline-block rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
                   {doctorProfile.qualifications}
                 </span>
@@ -44,17 +44,6 @@ export function DoctorProfile() {
                 <p className="mt-0.5 text-[13px] font-medium tracking-wide text-gold">
                   {doctorProfile.role}
                 </p>
-
-               
-
-                <div className="mt-5">
-                  <BookButton
-                    treatment="Consultation with Dr. Pinky Varghese"
-                    className="btn-primary w-full text-[14px]"
-                  >
-                    <MessageCircle size={16} aria-hidden /> Direct Doctor Booking
-                  </BookButton>
-                </div>
               </div>
             </div>
           </div>
@@ -110,9 +99,9 @@ export function DoctorProfile() {
 
               <BookButton
                 treatment="Consultation with Dr. Pinky Varghese"
-                className="btn-ghost w-full sm:w-auto text-[14px]"
+                className="btn-primary w-full sm:w-auto text-[14px]"
               >
-                <MessageCircle size={16} /> Request Consultation Slot
+                <MessageCircle size={16} aria-hidden /> Request Consultation Slot
               </BookButton>
             </div>
           </div>

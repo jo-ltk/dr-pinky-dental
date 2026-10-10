@@ -147,7 +147,7 @@ export function TreatmentMap() {
               rel="noopener noreferrer"
               className="btn-primary mt-6 w-full sm:w-auto text-[14px] sm:text-[15px] flex items-center justify-center gap-2"
             >
-              <MessageCircle size={18} aria-hidden /> Book Now
+              <MessageCircle size={18} aria-hidden /> Enquire on WhatsApp
             </a>
             <p className="mt-4 text-[11px] leading-relaxed text-muted/70 border-t border-line/40 pt-3">
               * Illustration only. Not a diagnosis. Specific clinical recommendations are provided following an in-person examination by Dr. Pinky Varghese.
