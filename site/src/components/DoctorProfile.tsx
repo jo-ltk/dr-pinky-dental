@@ -45,15 +45,7 @@ export function DoctorProfile() {
                   {doctorProfile.role}
                 </p>
 
-                {/* Consultation Locations */}
-                <div className="mt-4 border-t border-gold/20 pt-3">
-                  <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
-                    <MapPin size={12} className="text-gold" /> Consultation Centres
-                  </p>
-                  <p className="mt-1 text-[12px] text-cream/80">
-                    {doctorProfile.locations.join(" · ")}
-                  </p>
-                </div>
+               
 
                 <div className="mt-5">
                   <BookButton

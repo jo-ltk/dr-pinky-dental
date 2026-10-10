@@ -106,36 +106,53 @@ export function TreatmentMap() {
             Every restoration begins with prosthodontic examination and bite analysis. Select a treatment below to view an example clinical overview.
           </p>
 
-          <div role="group" aria-label="Example treatment categories" className="mt-8 flex flex-wrap gap-2">
-            {CATS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                aria-pressed={sel === c.id}
-                onClick={() => setSel(c.id)}
-                className={`h-11 border px-4 text-[13px] font-medium transition-all duration-300 ${
-                  sel === c.id
-                    ? "border-gold bg-gold/15 text-gold-champagne"
-                    : "border-line bg-surface/50 text-cream/75 hover:border-gold/50 hover:text-cream"
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
+          {/* Treatment Category Selector - Horizontally scrollable on mobile, flex-wrap on desktop */}
+          <div className="mt-8 relative">
+            <div
+              role="group"
+              aria-label="Example treatment categories"
+              className="-mx-5 flex gap-2.5 overflow-x-auto px-5 pb-3 pt-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0"
+            >
+              {CATS.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  aria-pressed={sel === c.id}
+                  onClick={() => setSel(c.id)}
+                  className={`h-11 shrink-0 rounded-full border px-5 text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                    sel === c.id
+                      ? "border-gold bg-gradient-to-r from-gold/25 via-gold/15 to-gold/10 text-gold-champagne shadow-[0_0_16px_rgba(212,175,106,0.3)] ring-1 ring-gold/40"
+                      : "border-line bg-surface/60 text-cream/70 hover:border-gold/40 hover:bg-surface hover:text-cream"
+                  }`}
+                >
+                  <span className={`h-2 w-2 rounded-full transition-colors ${sel === c.id ? "bg-gold shadow-[0_0_8px_#D4AF6A]" : "bg-gold/30"}`} />
+                  {c.name}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-8 border-t border-line pt-6" aria-live="polite">
-            <p className="text-[19px] font-medium leading-snug text-cream">{cat.name}</p>
-            <p className="mt-2 max-w-[440px] text-[14px] leading-[1.6] text-muted">{cat.text}</p>
+          {/* Active Treatment Detail Box */}
+          <div className="mt-6 rounded-2xl border border-line-strong bg-glass-card/90 p-6 sm:p-7 backdrop-blur-xl shadow-royal" aria-live="polite">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[20px] font-medium leading-snug text-cream">{cat.name}</p>
+              <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-medium text-gold-champagne">
+                {count} {count === 1 ? "area" : "areas"} mapped
+              </span>
+            </div>
+            <p className="mt-3 text-[14px] leading-[1.65] text-muted">{cat.text}</p>
             <a
               href={whatsappUrl(enquiryMessage(cat.name))}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary mt-6 !h-12 !text-[14px]"
+              className="btn-primary mt-6 w-full sm:w-auto text-[14px] sm:text-[15px] flex items-center justify-center gap-2.5"
             >
-              <MessageCircle size={17} aria-hidden /> Enquire about {cat.name} on WhatsApp
+              <span className="grid h-6 w-6 place-items-center rounded-sm bg-white text-[#26082F]">
+                <MessageCircle size={15} aria-hidden />
+              </span>
+              Enquire about {cat.name} on WhatsApp
             </a>
-            <p className="mt-4 text-[11px] leading-relaxed text-muted/70">
+            <p className="mt-4 text-[11px] leading-relaxed text-muted/70 border-t border-line/40 pt-3">
               * Illustration only. Not a diagnosis. Specific clinical recommendations are provided following an in-person examination by Dr. Pinky Varghese.
             </p>
           </div>
