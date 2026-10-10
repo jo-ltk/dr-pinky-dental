@@ -40,7 +40,7 @@ export function BookingSection() {
   };
 
   const field =
-    "mt-1.5 block w-full border border-line-strong bg-surface/70 min-h-[48px] px-4 py-3 text-[15px] text-cream placeholder:text-muted/50 transition-colors focus:border-gold focus:outline-none focus-visible:outline-2 focus-visible:outline-gold";
+    "mt-1.5 block w-full max-w-full box-border border border-line-strong bg-surface/70 min-h-[46px] sm:min-h-[48px] px-3.5 sm:px-4 py-2.5 sm:py-3 text-[14px] sm:text-[15px] text-cream placeholder:text-muted/50 transition-colors focus:border-gold focus:outline-none focus-visible:outline-2 focus-visible:outline-gold rounded-sm";
   const err = (k: keyof Form) =>
     errors[k] ? (
       <p id={`${uid}-${k}-err`} className="mt-1 text-[12px] font-medium text-[#fca5a5]">
@@ -55,21 +55,21 @@ export function BookingSection() {
   });
 
   return (
-    <section id="booking" className="relative border-t border-line bg-surface/30 py-24 sm:py-32" aria-labelledby="booking-title">
+    <section id="booking" className="relative overflow-hidden border-t border-line bg-surface/30 py-20 sm:py-32" aria-labelledby="booking-title">
       <div className="wrap">
-        <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
           {/* Left Column: context & reassurance */}
           <div className="lg:col-span-5" data-reveal>
             <p className="label">Simple Appointment Booking</p>
             <h2
               id="booking-title"
-              className="mt-4 text-[clamp(36px,4.5vw,68px)] font-light leading-[1] tracking-hero text-cream"
+              className="mt-4 text-[clamp(32px,4.5vw,68px)] font-light leading-[1] tracking-hero text-cream"
             >
               Book your visit in<br />
-              <span className="text-gold-champagne">one quick conversation.</span>
+              <span className="text-gold-champagne font-normal">one quick conversation.</span>
             </h2>
 
-            <p className="mt-6 text-[15px] leading-[1.65] text-muted">
+            <p className="mt-5 sm:mt-6 text-[14px] sm:text-[15px] leading-[1.65] text-muted">
               Select your preferred treatment, date, and consultation centre in Ernakulam, Aluva, Kakkanad, or Angamaly. We will prepare your detailed request and open WhatsApp directly with Dr. Pinky Varghese’s clinic desk.
             </p>
 
@@ -108,19 +108,19 @@ export function BookingSection() {
 
           {/* Right Column: the complete interactive form */}
           <div className="lg:col-span-7" data-reveal style={{ ["--d" as string]: 1 }}>
-            <div className="border border-line bg-gradient-to-b from-royal/40 via-surface/80 to-bg p-6 sm:p-10 shadow-royal">
-              <h3 className="text-[22px] font-normal tracking-tight text-cream">
+            <div className="border border-line bg-gradient-to-b from-royal/40 via-surface/80 to-bg p-4 sm:p-8 lg:p-10 shadow-royal">
+              <h3 className="text-[20px] sm:text-[22px] font-normal tracking-tight text-cream">
                 Consultation Request Form
               </h3>
-              <p className="mt-1 text-[13px] text-muted">
+              <p className="mt-1 text-[12px] sm:text-[13px] text-muted">
                 Fields marked with <span className="text-gold">*</span> are required.
               </p>
 
-              <form onSubmit={submit} noValidate className="mt-6 space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
+              <form onSubmit={submit} noValidate className="mt-5 sm:mt-6 space-y-4 sm:space-y-5">
+                <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
                   {/* Full Name */}
-                  <div>
-                    <label htmlFor={`${uid}-name`} className="text-[13px] font-medium text-cream">
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-name`} className="block text-[13px] font-medium text-cream">
                       Full Name <span className="text-gold">*</span>
                     </label>
                     <input
@@ -136,8 +136,8 @@ export function BookingSection() {
                   </div>
 
                   {/* Phone Number */}
-                  <div>
-                    <label htmlFor={`${uid}-phone`} className="text-[13px] font-medium text-cream">
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-phone`} className="block text-[13px] font-medium text-cream">
                       Phone Number <span className="text-gold">*</span>
                     </label>
                     <input
@@ -155,10 +155,10 @@ export function BookingSection() {
                   </div>
                 </div>
 
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className="grid gap-4 sm:gap-5 sm:grid-cols-2">
                   {/* Treatment */}
-                  <div>
-                    <label htmlFor={`${uid}-treatment`} className="text-[13px] font-medium text-cream">
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-treatment`} className="block text-[13px] font-medium text-cream">
                       Preferred Treatment <span className="text-gold">*</span>
                     </label>
                     <select
@@ -182,11 +182,13 @@ export function BookingSection() {
                   </div>
 
                   {/* Location Selection */}
-                  <div>
-                    <label className="text-[13px] font-medium text-cream flex items-center gap-1.5">
-                      <MapPin size={13} className="text-gold" /> Consultation Location
+                  <div className="w-full">
+                    <label className="block text-[13px] font-medium text-cream">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin size={13} className="text-gold" /> Consultation Location
+                      </span>
                     </label>
-                    <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                    <div className="mt-1.5 grid grid-cols-2 gap-2">
                       {clinic.locations.map((loc) => {
                         const on = form.location === loc.name;
                         return (
@@ -195,13 +197,13 @@ export function BookingSection() {
                             type="button"
                             aria-pressed={on}
                             onClick={() => pick("location", loc.name)}
-                            className={`h-11 border text-[12px] font-medium transition-colors ${
+                            className={`flex h-11 items-center justify-center rounded-sm border px-2 text-center text-[12px] sm:text-[13px] font-medium transition-colors ${
                               on
-                                ? "border-gold bg-gold text-[#26082F] font-semibold"
+                                ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
                                 : "border-line bg-surface/60 text-cream/90 hover:border-gold/50"
                             }`}
                           >
-                            {loc.name}
+                            <span className="truncate">{loc.name}</span>
                           </button>
                         );
                       })}
@@ -210,7 +212,7 @@ export function BookingSection() {
                 </div>
 
                 {/* Date Picker Chips */}
-                <fieldset aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
+                <fieldset className="w-full" aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
                   <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
                     <CalendarDays size={14} className="text-gold" /> Preferred Appointment Date <span className="text-gold">*</span>
                   </legend>
@@ -223,16 +225,16 @@ export function BookingSection() {
                           type="button"
                           aria-pressed={on}
                           onClick={() => pick("date", d.iso)}
-                          className={`flex h-[64px] w-[54px] shrink-0 snap-start flex-col items-center justify-center border transition-colors ${
+                          className={`flex h-[64px] w-[54px] shrink-0 snap-start flex-col items-center justify-center rounded-sm border transition-colors ${
                             on
-                              ? "border-gold bg-gold text-[#26082F] font-semibold"
+                              ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
                               : "border-line bg-surface/60 text-cream hover:border-gold/50"
                           }`}
                         >
                           <span className={`text-[10px] font-medium ${on ? "text-[#26082F]" : "text-gold-champagne"}`}>
                             {d.dow}
                           </span>
-                          <span className="text-[18px] font-medium leading-none">{d.day}</span>
+                          <span className="text-[18px] font-medium leading-none my-0.5">{d.day}</span>
                           <span className={`text-[10px] ${on ? "text-[#26082F]" : "text-muted"}`}>
                             {d.mon}
                           </span>
@@ -240,22 +242,22 @@ export function BookingSection() {
                       );
                     })}
                   </div>
-                  <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
-                    <span className="shrink-0 text-cream/80">Other date:</span>
+                  <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
+                    <span className="shrink-0 text-cream/80">Or pick date:</span>
                     <input
                       {...aria("date")}
-                      className={`${field} !mt-0 !w-auto min-w-0 flex-1 [color-scheme:dark]`}
+                      className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                       type="date"
                       min={todayISO()}
                       value={form.date}
                       onChange={set("date")}
                     />
-                  </label>
+                  </div>
                   {err("date")}
                 </fieldset>
 
                 {/* Time Slot Chips */}
-                <fieldset aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
+                <fieldset className="w-full" aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
                   <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
                     <Clock size={14} className="text-gold" /> Preferred Time Slot <span className="text-gold">*</span>
                   </legend>
@@ -268,9 +270,9 @@ export function BookingSection() {
                           type="button"
                           aria-pressed={on}
                           onClick={() => pick("time", t)}
-                          className={`h-10 border text-[12px] font-medium transition-colors ${
+                          className={`h-10 rounded-sm border px-1 text-[12px] sm:text-[13px] font-medium transition-colors text-center ${
                             on
-                              ? "border-gold bg-gold text-[#26082F] font-semibold"
+                              ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
                               : "border-line bg-surface/60 text-cream hover:border-gold/50"
                           }`}
                         >
@@ -279,23 +281,23 @@ export function BookingSection() {
                       );
                     })}
                   </div>
-                  <label className="mt-2 flex items-center gap-2 text-[12px] text-muted">
-                    <span className="shrink-0 text-cream/80">Other time:</span>
+                  <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
+                    <span className="shrink-0 text-cream/80">Or custom time:</span>
                     <input
                       {...aria("time")}
-                      className={`${field} !mt-0 !w-auto min-w-0 flex-1 [color-scheme:dark]`}
+                      className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
                       type="time"
                       step={900}
                       value={form.time}
                       onChange={set("time")}
                     />
-                  </label>
+                  </div>
                   {err("time")}
                 </fieldset>
 
                 {/* Optional Message */}
-                <div>
-                  <label htmlFor={`${uid}-notes`} className="text-[13px] font-medium text-cream">
+                <div className="w-full">
+                  <label htmlFor={`${uid}-notes`} className="block text-[13px] font-medium text-cream">
                     Optional Message / Specific Questions
                   </label>
                   <textarea
@@ -309,10 +311,10 @@ export function BookingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <button type="submit" className="btn-primary h-14 w-full text-[16px]">
+                  <button type="submit" className="btn-primary h-13 sm:h-14 w-full text-[15px] sm:text-[16px] flex items-center justify-center gap-2">
                     <MessageCircle size={19} aria-hidden /> Book on WhatsApp
                   </button>
-                  <p className="mt-3 text-center text-[12px] text-muted">
+                  <p className="mt-3 text-center text-[11px] sm:text-[12px] text-muted">
                     {sent
                       ? "WhatsApp opened! Send the prepared message to confirm your appointment."
                       : "Generates your formatted appointment request to https://wa.me/919562980890"}
@@ -326,3 +328,4 @@ export function BookingSection() {
     </section>
   );
 }
+

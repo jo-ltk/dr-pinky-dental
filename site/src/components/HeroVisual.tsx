@@ -58,7 +58,7 @@ export function HeroVisual({
   }, []);
 
   return (
-    <div ref={box} className={`relative ${className}`} aria-hidden="true">
+    <div ref={box} className={`relative overflow-hidden ${className}`} aria-hidden="true">
       {/* Warm champagne gold and royal purple volumetric ambient glow */}
       <div className="ambient pointer-events-none absolute left-1/2 top-[40%] h-[74%] w-[94%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(212,175,106,0.28),rgba(81,20,95,0.32)_55%,transparent)] blur-2xl" />
       <div className="pointer-events-none absolute bottom-[3%] left-1/2 h-[6%] w-[36%] -translate-x-1/2 rounded-[50%] bg-[#120217]/85 blur-xl" />

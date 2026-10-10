@@ -2,7 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BookButton } from "./booking";
+import { BookButton, useBooking } from "./booking";
 
 /**
  * Desktop: floating WhatsApp button. Mobile: sticky bottom bar. Both appear after the hero.
@@ -10,6 +10,7 @@ import { BookButton } from "./booking";
  */
 export function FloatingCta() {
   const [show, setShow] = useState(false);
+  const { isOpen } = useBooking();
 
   useEffect(() => {
     const on = () => setShow(window.scrollY > (window.innerWidth < 640 ? 320 : window.innerHeight * 0.6));
@@ -18,12 +19,14 @@ export function FloatingCta() {
     return () => window.removeEventListener("scroll", on);
   }, []);
 
+  const visible = show && !isOpen;
+
   return (
     <>
       {/* Desktop Floating Pill */}
       <div
         className={`fixed bottom-6 right-6 z-40 hidden transition-all duration-500 sm:block ${
-          show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+          visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
         }`}
       >
         <BookButton
@@ -43,11 +46,11 @@ export function FloatingCta() {
       {/* Mobile Sticky Bar */}
       <div
         className={`fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 p-3 backdrop-blur-2xl transition-transform duration-500 sm:hidden ${
-          show ? "translate-y-0" : "translate-y-full"
+          visible ? "translate-y-0" : "translate-y-full pointer-events-none"
         }`}
         style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
       >
-        <BookButton className="btn-primary h-14 w-full text-[16px]">
+        <BookButton className="btn-primary h-13 sm:h-14 w-full text-[15px] sm:text-[16px] flex items-center justify-center gap-2">
           <span className="grid h-7 w-7 shrink-0 place-items-center rounded-sm bg-[#25D366] text-[#072512]">
             <MessageCircle size={16} strokeWidth={2.4} aria-hidden />
           </span>
@@ -57,3 +60,4 @@ export function FloatingCta() {
     </>
   );
 }
+

@@ -8,9 +8,10 @@ import { bookingMessage, enquiryMessage, openWhatsApp, whatsappUrl } from "@/lib
 
 type Ctx = {
   open: (treatment?: string, location?: string) => void;
+  isOpen: boolean;
 };
 
-const BookingContext = createContext<Ctx>({ open: () => {} });
+const BookingContext = createContext<Ctx>({ open: () => {}, isOpen: false });
 export const useBooking = () => useContext(BookingContext);
 
 /**
@@ -132,7 +133,15 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   const panel = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const uid = useId();
-  const [desk, setDesk] = useState(true);
+  const [desk, setDesk] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 640px)");
+    setDesk(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setDesk(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
   const open = useCallback((treatment?: string, location?: string) => {
     lastFocus.current = document.activeElement as HTMLElement;
@@ -143,7 +152,9 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     }));
     setErrors({});
     setSent(false);
-    setDesk(window.matchMedia("(min-width: 640px)").matches);
+    if (typeof window !== "undefined") {
+      setDesk(window.matchMedia("(min-width: 640px)").matches);
+    }
     setOpen(true);
   }, []);
 
@@ -154,27 +165,38 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    const prev = document.body.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyTouchAction = document.body.style.touchAction;
+
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+
     const t = setTimeout(() => panel.current?.focus(), 80);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "Tab" && panel.current) {
-        const f = Array.from(panel.current.querySelectorAll<HTMLElement>("a[href],button,input,select,textarea")).filter((el) => !el.hasAttribute("disabled"));
-        const first = f[0], last = f[f.length - 1];
+        const f = Array.from(
+          panel.current.querySelectorAll<HTMLElement>("a[href],button,input,select,textarea")
+        ).filter((el) => !el.hasAttribute("disabled"));
+        const first = f[0],
+          last = f[f.length - 1];
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
-          last.focus();
+          last?.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
           e.preventDefault();
-          first.focus();
+          first?.focus();
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => {
       clearTimeout(t);
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.touchAction = prevBodyTouchAction;
       window.removeEventListener("keydown", onKey);
     };
   }, [isOpen, close]);
@@ -206,7 +228,7 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   };
 
   const field =
-    "mt-1.5 block w-full border border-line-strong bg-surface/80 min-h-[48px] px-4 py-3 text-[15px] text-cream placeholder:text-muted/50 transition-colors focus:border-gold focus:outline-none focus-visible:outline-2 focus-visible:outline-gold";
+    "mt-1.5 block w-full max-w-full box-border border border-line-strong bg-surface/80 min-h-[46px] sm:min-h-[48px] px-3.5 sm:px-4 py-2.5 sm:py-3 text-[14px] sm:text-[15px] text-cream placeholder:text-muted/50 transition-colors focus:border-gold focus:outline-none focus-visible:outline-2 focus-visible:outline-gold rounded-sm";
   const err = (k: keyof Form) =>
     errors[k] ? (
       <p id={`${uid}-${k}-err`} className="mt-1 text-[12px] font-medium text-[#fca5a5]">
@@ -221,265 +243,287 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <BookingContext.Provider value={{ open }}>
+    <BookingContext.Provider value={{ open, isOpen }}>
       {children}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-stretch sm:justify-end" role="presentation">
+          <div
+            className="fixed inset-0 z-[100] flex items-end justify-center sm:items-stretch sm:justify-end overflow-hidden"
+            role="presentation"
+          >
+            {/* Backdrop */}
             <motion.div
-              className="absolute inset-0 bg-[#120217]/75 backdrop-blur-sm"
+              className="fixed inset-0 bg-[#120217]/80 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: reduce ? 0 : 0.3 }}
+              transition={{ duration: reduce ? 0 : 0.25 }}
               onClick={close}
             />
+
+            {/* Modal / Drawer Dialog */}
             <motion.div
               ref={panel}
               role="dialog"
               aria-modal="true"
               aria-labelledby={`${uid}-title`}
               tabIndex={-1}
-              className="relative flex max-h-[96dvh] w-full flex-col overflow-y-auto overscroll-contain border-t outline-none border-line-strong bg-bg sm:max-h-none sm:h-full sm:w-[500px] sm:border-l sm:border-t-0 shadow-2xl"
+              className="relative z-10 flex h-auto max-h-[92dvh] w-full max-w-[100vw] sm:max-w-[480px] sm:w-[480px] sm:h-full sm:max-h-none flex-col overflow-hidden rounded-t-2xl sm:rounded-none border-t sm:border-t-0 sm:border-l border-line-strong bg-bg shadow-2xl outline-none"
               initial={reduce ? { opacity: 0 } : desk ? { x: "100%" } : { y: "100%" }}
               animate={{ x: 0, y: 0, opacity: 1 }}
               exit={reduce ? { opacity: 0 } : desk ? { x: "100%" } : { y: "100%" }}
-              transition={{ type: "tween", ease: [0.2, 0.7, 0.2, 1], duration: reduce ? 0 : 0.45 }}
+              transition={{ type: "tween", ease: [0.22, 1, 0.36, 1], duration: reduce ? 0 : 0.4 }}
+              style={{ touchAction: "pan-y" }}
             >
-              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-royal/40 blur-3xl" />
-              <div className="pointer-events-none absolute -left-20 bottom-32 h-60 w-60 rounded-full bg-gold/15 blur-3xl" />
+              {/* Background ambient lighting strictly confined */}
+              <div className="pointer-events-none absolute -right-16 -top-16 h-60 w-60 rounded-full bg-royal/40 blur-3xl" />
+              <div className="pointer-events-none absolute -left-16 bottom-24 h-52 w-52 rounded-full bg-gold/15 blur-3xl" />
 
-              <div className="relative flex items-start justify-between px-5 pb-2 pt-4 sm:px-8 sm:pt-8">
-                <span className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-cream/20 sm:hidden" aria-hidden />
-                <div>
-                  <p className="label">Dr. Pinky Varghese</p>
-                  <h2 id={`${uid}-title`} className="mt-1 text-[24px] sm:text-[28px] font-light leading-[1.1] tracking-tight text-cream">
-                    Book on <span className="text-gold-champagne">WhatsApp</span>
-                  </h2>
+              {/* Fixed Top Header Bar */}
+              <div className="relative shrink-0 border-b border-line/60 bg-bg/95 px-4 pt-3.5 pb-3 sm:px-6 sm:pt-6 sm:pb-4 backdrop-blur-md">
+                <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-cream/25 sm:hidden" aria-hidden="true" />
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="label">Dr. Pinky Varghese</p>
+                    <h2
+                      id={`${uid}-title`}
+                      className="mt-0.5 text-[21px] sm:text-[26px] font-light leading-[1.15] tracking-tight text-cream"
+                    >
+                      Book on <span className="text-gold-champagne font-normal">WhatsApp</span>
+                    </h2>
+                    <p className="mt-0.5 text-[12px] sm:text-[13px] leading-snug text-muted">
+                      Official: <strong className="text-gold-champagne font-semibold font-mono">+91 95629 80890</strong>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={close}
+                    className="shrink-0 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-sm border border-line-strong text-gold-champagne transition-colors hover:border-gold hover:text-cream hover:bg-surface/50 active:scale-95"
+                    aria-label="Close booking form"
+                  >
+                    <X size={19} />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={close}
-                  className="grid h-11 w-11 place-items-center border border-line text-gold-champagne transition-colors hover:border-gold hover:text-cream hover:bg-surface/50"
-                  aria-label="Close booking form"
-                >
-                  <X size={18} />
-                </button>
               </div>
 
-              <p className="relative px-5 text-[13px] leading-relaxed text-muted sm:px-8">
-                Official WhatsApp: <strong className="text-gold-champagne font-semibold">+91 95629 80890</strong>. Appointments are confirmed directly with the clinic team.
-              </p>
+              {/* Scrollable Form Body */}
+              <div className="relative flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 py-4 sm:px-6 sm:py-5">
+                <form id={`${uid}-booking-form`} onSubmit={submit} noValidate className="flex flex-col gap-4 sm:gap-5">
+                  {/* Full Name */}
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-name`} className="block text-[13px] font-medium text-cream">
+                      Full Name <span className="text-gold">*</span>
+                    </label>
+                    <input
+                      {...aria("name")}
+                      className={field}
+                      autoComplete="name"
+                      value={form.name}
+                      onChange={set("name")}
+                      placeholder="e.g. Rahul Sharma"
+                      required
+                    />
+                    {err("name")}
+                  </div>
 
-              <form onSubmit={submit} noValidate className="relative flex flex-1 flex-col gap-5 px-5 pb-6 pt-5 sm:px-8">
-                {/* Full Name */}
-                <div>
-                  <label htmlFor={`${uid}-name`} className="text-[13px] font-medium text-cream">
-                    Full Name <span className="text-gold">*</span>
-                  </label>
-                  <input
-                    {...aria("name")}
-                    className={field}
-                    autoComplete="name"
-                    value={form.name}
-                    onChange={set("name")}
-                    placeholder="e.g. Rahul Sharma"
-                    required
-                  />
-                  {err("name")}
-                </div>
+                  {/* Phone Number */}
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-phone`} className="block text-[13px] font-medium text-cream">
+                      Phone / WhatsApp Number <span className="text-gold">*</span>
+                    </label>
+                    <input
+                      {...aria("phone")}
+                      className={field}
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      value={form.phone}
+                      onChange={set("phone")}
+                      placeholder="+91 95629 80890"
+                      required
+                    />
+                    {err("phone")}
+                  </div>
 
-                {/* Phone Number */}
-                <div>
-                  <label htmlFor={`${uid}-phone`} className="text-[13px] font-medium text-cream">
-                    Phone / WhatsApp Number <span className="text-gold">*</span>
-                  </label>
-                  <input
-                    {...aria("phone")}
-                    className={field}
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    value={form.phone}
-                    onChange={set("phone")}
-                    placeholder="+91 95629 80890"
-                    required
-                  />
-                  {err("phone")}
-                </div>
-
-                {/* Preferred Treatment */}
-                <div>
-                  <label htmlFor={`${uid}-treatment`} className="text-[13px] font-medium text-cream">
-                    Preferred Treatment <span className="text-gold">*</span>
-                  </label>
-                  <select
-                    {...aria("treatment")}
-                    className={`${field} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23D4AF6A%22 fill=%22none%22 stroke-width=%221.5%22/></svg>')] bg-[right_1rem_center] bg-no-repeat pr-10`}
-                    value={form.treatment}
-                    onChange={set("treatment")}
-                    required
-                  >
-                    <option value="" disabled className="bg-bg text-cream">Select a treatment</option>
-                    {treatments.map((t) => (
-                      <option key={t.id} value={t.name} className="bg-bg text-cream">
-                        {t.name}
+                  {/* Preferred Treatment */}
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-treatment`} className="block text-[13px] font-medium text-cream">
+                      Preferred Treatment <span className="text-gold">*</span>
+                    </label>
+                    <select
+                      {...aria("treatment")}
+                      className={`${field} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23D4AF6A%22 fill=%22none%22 stroke-width=%221.5%22/></svg>')] bg-[right_1rem_center] bg-no-repeat pr-10`}
+                      value={form.treatment}
+                      onChange={set("treatment")}
+                      required
+                    >
+                      <option value="" disabled className="bg-bg text-cream">Select a treatment</option>
+                      {treatments.map((t) => (
+                        <option key={t.id} value={t.name} className="bg-bg text-cream">
+                          {t.name}
+                        </option>
+                      ))}
+                      <option value="Consultation / Smile Evaluation" className="bg-bg text-cream">
+                        Consultation / Smile Evaluation
                       </option>
-                    ))}
-                    <option value="Consultation / Smile Evaluation" className="bg-bg text-cream">
-                      Consultation / Smile Evaluation
-                    </option>
-                  </select>
-                  {err("treatment")}
-                </div>
-
-                {/* Preferred Location */}
-                <div>
-                  <label htmlFor={`${uid}-location`} className="text-[13px] font-medium text-cream flex items-center gap-1.5">
-                    <MapPin size={14} className="text-gold" /> Consultation Location
-                  </label>
-                  <div className="mt-1.5 grid grid-cols-2 gap-2">
-                    {clinic.locations.map((loc) => {
-                      const on = form.location === loc.name;
-                      return (
-                        <button
-                          key={loc.id}
-                          type="button"
-                          aria-pressed={on}
-                          onClick={() => pick("location", loc.name)}
-                          className={`h-11 border text-[13px] font-medium transition-colors ${
-                            on
-                              ? "border-gold bg-gold text-[#26082F] font-semibold"
-                              : "border-line bg-surface/50 text-cream/90 hover:border-gold/50"
-                          }`}
-                        >
-                          {loc.name}
-                        </button>
-                      );
-                    })}
+                    </select>
+                    {err("treatment")}
                   </div>
-                </div>
 
-                {/* Preferred Date */}
-                <fieldset aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
-                  <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                    <CalendarDays size={14} className="text-gold" aria-hidden /> Preferred Appointment Date <span className="text-gold">*</span>
-                  </legend>
-                  <div className="-mx-5 mt-2 flex snap-x gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:-mx-8 sm:px-8">
-                    {days.map((d) => {
-                      const on = form.date === d.iso;
-                      return (
-                        <button
-                          key={d.iso}
-                          type="button"
-                          aria-pressed={on}
-                          aria-label={`${d.dow} ${d.day} ${d.mon}`}
-                          onClick={() => pick("date", d.iso)}
-                          className={`flex h-[68px] w-[58px] shrink-0 snap-start flex-col items-center justify-center border transition-colors ${
-                            on
-                              ? "border-gold bg-gold text-[#26082F] font-semibold"
-                              : "border-line bg-surface/60 text-cream active:bg-surface"
-                          }`}
-                        >
-                          <span className={`text-[10px] font-medium ${on ? "text-[#26082F]" : "text-gold-champagne"}`}>
-                            {d.dow}
-                          </span>
-                          <span className="text-[20px] font-medium leading-none">{d.day}</span>
-                          <span className={`text-[10px] ${on ? "text-[#26082F]" : "text-muted"}`}>
-                            {d.mon}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  {/* Consultation Location */}
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-location`} className="block text-[13px] font-medium text-cream">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin size={14} className="text-gold" /> Consultation Location
+                      </span>
+                    </label>
+                    <div className="mt-1.5 grid grid-cols-2 gap-2">
+                      {clinic.locations.map((loc) => {
+                        const on = form.location === loc.name;
+                        return (
+                          <button
+                            key={loc.id}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => pick("location", loc.name)}
+                            className={`flex h-11 items-center justify-center rounded-sm border px-2 text-center text-[12px] sm:text-[13px] font-medium transition-colors ${
+                              on
+                                ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
+                                : "border-line bg-surface/50 text-cream/90 hover:border-gold/50 hover:bg-surface"
+                            }`}
+                          >
+                            <span className="truncate">{loc.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <label className="mt-2.5 flex items-center gap-3 text-[12px] text-muted">
-                    <span className="w-[84px] shrink-0 text-cream/80">Other date:</span>
-                    <input
-                      {...aria("date")}
-                      className={`${field} !mt-0 min-w-0 flex-1 !w-auto [color-scheme:dark]`}
-                      type="date"
-                      min={todayISO()}
-                      value={form.date}
-                      onChange={set("date")}
+
+                  {/* Preferred Appointment Date */}
+                  <fieldset className="w-full" aria-describedby={errors.date ? `${uid}-date-err` : undefined}>
+                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                      <CalendarDays size={14} className="text-gold" aria-hidden /> Preferred Appointment Date <span className="text-gold">*</span>
+                    </legend>
+                    <div className="mt-2 flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+                      {days.map((d) => {
+                        const on = form.date === d.iso;
+                        return (
+                          <button
+                            key={d.iso}
+                            type="button"
+                            aria-pressed={on}
+                            aria-label={`${d.dow} ${d.day} ${d.mon}`}
+                            onClick={() => pick("date", d.iso)}
+                            className={`flex h-[66px] w-[56px] shrink-0 snap-start flex-col items-center justify-center rounded-sm border transition-colors ${
+                              on
+                                ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
+                                : "border-line bg-surface/60 text-cream hover:border-gold/50 active:bg-surface"
+                            }`}
+                          >
+                            <span className={`text-[10px] font-medium ${on ? "text-[#26082F]" : "text-gold-champagne"}`}>
+                              {d.dow}
+                            </span>
+                            <span className="text-[19px] font-medium leading-none my-0.5">{d.day}</span>
+                            <span className={`text-[10px] ${on ? "text-[#26082F]" : "text-muted"}`}>
+                              {d.mon}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
+                      <span className="shrink-0 text-cream/80">Or pick date:</span>
+                      <input
+                        {...aria("date")}
+                        className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
+                        type="date"
+                        min={todayISO()}
+                        value={form.date}
+                        onChange={set("date")}
+                      />
+                    </div>
+                    {err("date")}
+                  </fieldset>
+
+                  {/* Preferred Time Slot */}
+                  <fieldset className="w-full" aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
+                    <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
+                      <Clock size={14} className="text-gold" aria-hidden /> Preferred Time Slot <span className="text-gold">*</span>
+                    </legend>
+                    <div className="mt-2 grid grid-cols-3 gap-2">
+                      {SLOTS.map((t) => {
+                        const on = form.time === t;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => pick("time", t)}
+                            className={`h-11 rounded-sm border px-1 text-[12px] sm:text-[13px] font-medium transition-colors text-center ${
+                              on
+                                ? "border-gold bg-gold text-[#26082F] font-semibold shadow-sm"
+                                : "border-line bg-surface/60 text-cream hover:border-gold/50 active:bg-surface"
+                            }`}
+                          >
+                            {slotLabel(t)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center gap-2 text-[12px] text-muted">
+                      <span className="shrink-0 text-cream/80">Or custom time:</span>
+                      <input
+                        {...aria("time")}
+                        className={`${field} !mt-0 w-full flex-1 [color-scheme:dark]`}
+                        type="time"
+                        step={900}
+                        value={form.time}
+                        onChange={set("time")}
+                      />
+                    </div>
+                    {err("time")}
+                  </fieldset>
+
+                  {/* Optional Message */}
+                  <div className="w-full">
+                    <label htmlFor={`${uid}-notes`} className="block text-[13px] font-medium text-cream">
+                      Optional Message / Clinical Notes
+                    </label>
+                    <textarea
+                      {...aria("notes")}
+                      className={`${field} min-h-[72px] resize-y`}
+                      value={form.notes}
+                      onChange={set("notes")}
+                      placeholder="Tell Dr. Pinky about your dental concern or treatment goals..."
+                      maxLength={500}
                     />
-                  </label>
-                  {err("date")}
-                </fieldset>
-
-                {/* Preferred Time */}
-                <fieldset aria-describedby={errors.time ? `${uid}-time-err` : undefined}>
-                  <legend className="flex items-center gap-1.5 text-[13px] font-medium text-cream">
-                    <Clock size={14} className="text-gold" aria-hidden /> Preferred Time Slot <span className="text-gold">*</span>
-                  </legend>
-                  <div className="mt-2 grid grid-cols-3 gap-2">
-                    {SLOTS.map((t) => {
-                      const on = form.time === t;
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          aria-pressed={on}
-                          onClick={() => pick("time", t)}
-                          className={`h-11 border text-[13px] font-medium transition-colors ${
-                            on
-                              ? "border-gold bg-gold text-[#26082F] font-semibold"
-                              : "border-line bg-surface/60 text-cream hover:border-gold/50"
-                          }`}
-                        >
-                          {slotLabel(t)}
-                        </button>
-                      );
-                    })}
                   </div>
-                  <label className="mt-2.5 flex items-center gap-3 text-[12px] text-muted">
-                    <span className="w-[84px] shrink-0 text-cream/80">Other time:</span>
-                    <input
-                      {...aria("time")}
-                      className={`${field} !mt-0 min-w-0 flex-1 !w-auto [color-scheme:dark]`}
-                      type="time"
-                      step={900}
-                      value={form.time}
-                      onChange={set("time")}
-                    />
-                  </label>
-                  {err("time")}
-                </fieldset>
+                </form>
+              </div>
 
-                {/* Optional Message */}
-                <div>
-                  <label htmlFor={`${uid}-notes`} className="text-[13px] font-medium text-cream">
-                    Optional Message / Clinical Notes
-                  </label>
-                  <textarea
-                    {...aria("notes")}
-                    className={`${field} min-h-[76px] resize-y`}
-                    value={form.notes}
-                    onChange={set("notes")}
-                    placeholder="Tell Dr. Pinky about your dental concern or treatment goals..."
-                    maxLength={500}
-                  />
-                </div>
-
-                {/* Submit Bar */}
-                <div className="sticky bottom-0 -mx-5 mt-auto flex flex-col gap-2 border-t border-line bg-bg/95 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur-md sm:-mx-8 sm:px-8">
-                  <button type="submit" className="btn-primary h-14 w-full text-[16px]">
-                    <MessageCircle size={19} aria-hidden /> Open WhatsApp Request
-                  </button>
-                  <p aria-live="polite" className="text-center text-[12px] leading-snug text-muted">
-                    {sent
-                      ? "WhatsApp opened! Send the prepared message to confirm your slot with Dr. Pinky."
-                      : "Generates your prefilled message to +91 95629 80890. Appointment confirmed upon clinic reply."}
-                  </p>
-                  <a
-                    href="https://wa.me/919562980890"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex min-h-[38px] items-center justify-center text-[13px] font-medium text-gold-champagne hover:underline"
-                  >
-                    Skip form — chat directly on WhatsApp
-                  </a>
-                </div>
-              </form>
+              {/* Sticky Bottom Submit Bar */}
+              <div className="relative shrink-0 border-t border-line/70 bg-bg/98 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pt-4 sm:pb-5 backdrop-blur-lg">
+                <button
+                  type="submit"
+                  form={`${uid}-booking-form`}
+                  className="btn-primary h-13 sm:h-14 w-full text-[15px] sm:text-[16px] shadow-gold flex items-center justify-center gap-2"
+                >
+                  <MessageCircle size={19} aria-hidden /> Open WhatsApp Request
+                </button>
+                <p aria-live="polite" className="mt-2 text-center text-[11px] sm:text-[12px] leading-tight text-muted">
+                  {sent
+                    ? "WhatsApp opened! Send the prepared message to confirm your slot with Dr. Pinky."
+                    : "Generates your prefilled message to +91 95629 80890. Appointment confirmed upon clinic reply."}
+                </p>
+                <a
+                  href="https://wa.me/919562980890"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 flex min-h-[36px] items-center justify-center text-[12px] sm:text-[13px] font-medium text-gold-champagne hover:underline"
+                >
+                  Skip form — chat directly on WhatsApp
+                </a>
+              </div>
             </motion.div>
           </div>
         )}
@@ -487,3 +531,4 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     </BookingContext.Provider>
   );
 }
+

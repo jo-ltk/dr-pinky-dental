@@ -13,7 +13,7 @@ const visuals: Record<string, { src: string; cls: string }> = {
 
 export function Services() {
   return (
-    <section id="services" className="relative py-24 sm:py-32" aria-labelledby="services-title">
+    <section id="services" className="relative overflow-hidden py-24 sm:py-32" aria-labelledby="services-title">
       <div className="wrap">
         <div className="grid gap-8 border-b border-line pb-12 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7" data-reveal>
