@@ -1,4 +1,4 @@
 {
-  "buildCommand": "cd site && npm install && npm run build",
-  "outputDirectory": "site/out"
+  "buildCommand": "if [ -d \"site\" ]; then cd site && npm install && npm run build && cd .. && cp -r site/out ./out 2>/dev/null || true; else npm run build; fi"
 }
+

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run dev --prefix site",
-    "build": "npm run build --prefix site",
+    "build": "if [ -d \"site\" ]; then cd site && npm install && npm run build; else next build; fi",
     "start": "npm run start --prefix site"
   }
 }
