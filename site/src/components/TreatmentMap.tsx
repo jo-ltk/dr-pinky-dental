@@ -130,7 +130,7 @@ export function TreatmentMap() {
   return (
     <section
       id="treatments"
-      className="relative overflow-x-clip border-t border-line pb-28 pt-16 sm:py-32 lg:pb-32"
+      className="relative overflow-x-clip border-t border-line py-24 sm:py-32"
       aria-labelledby="map-title"
     >
       <style>{`
@@ -156,48 +156,51 @@ export function TreatmentMap() {
 
       <div className="ambient pointer-events-none absolute -left-[15%] top-[10%] -z-10 h-[60%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgba(212,175,106,0.15),transparent)] blur-2xl" />
 
-      <div className="wrap grid gap-6 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-6">
+      <div className="wrap grid gap-8 lg:grid-cols-12 lg:gap-x-12 lg:gap-y-8">
         {/* 1 · Section Heading */}
         <div className="lg:col-span-5 lg:row-start-1" data-reveal>
           <p className="label">Personalized Treatment Architecture</p>
-          <h2 id="map-title" className="mt-3 text-[clamp(32px,4.6vw,68px)] font-light leading-[1] tracking-hero text-cream">
+          <h2 id="map-title" className="mt-4 text-[clamp(36px,5vw,72px)] font-light leading-[0.96] tracking-hero text-cream">
             A treatment plan<br /><span className="text-gold-champagne">mapped to you.</span>
           </h2>
-          <p className="mt-4 max-w-[440px] text-[14px] leading-[1.65] text-muted sm:text-[15px]">
+          <p className="mt-5 max-w-[440px] text-[15px] leading-[1.65] text-muted">
             Touch any procedure button below the interactive screen to observe how your bite, tooth positions, and clinical plan are customized.
           </p>
         </div>
 
-        {/* 2 · Interactive 3D Screen (Full-Screen on Mobile) + Arch Buttons below */}
+        {/* 2 · Interactive Diagram (Square Architectural Frame + Gold Corner Brackets) */}
         <div
           className="lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 flex flex-col items-center w-full"
           data-reveal
           style={{ ["--d" as string]: 1 }}
         >
-          {/* Mobile Full-Screen Container / Desktop Luxury Device Frame */}
-          <div className="relative -mx-5 w-[calc(100%+2.5rem)] sm:mx-0 sm:w-full sm:max-w-[460px] sm:rounded-[48px] sm:border sm:border-gold/30 sm:bg-[#1a0421] sm:p-3 sm:shadow-royal">
-            <div className="relative overflow-hidden rounded-none border-y border-gold/25 bg-[radial-gradient(120%_80%_at_50%_0%,#51145F_0%,#3B1048_45%,#26082F_100%)] px-4 pb-5 pt-4 sm:rounded-[38px] sm:border-0 sm:px-6 sm:pt-8">
-              
-              {/* Dynamic Island Speaker on desktop preview */}
-              <div className="absolute left-1/2 top-3 hidden h-6 w-24 -translate-x-1/2 rounded-full bg-black/85 sm:block" aria-hidden />
+          {/* Architectural Screen Frame with 1px hairlines & square corners */}
+          <div className="relative -mx-5 w-[calc(100%+2.5rem)] sm:mx-0 sm:w-full sm:max-w-[460px] border-y border-line bg-surface/90 sm:border sm:border-line p-4 sm:p-6 shadow-[0_0_40px_rgba(81,20,95,0.35)]">
+            {/* Gold architectural corner brackets */}
+            <div className="pointer-events-none absolute left-2.5 top-2.5 z-20 h-3.5 w-3.5 border-l border-t border-gold/60" />
+            <div className="pointer-events-none absolute right-2.5 top-2.5 z-20 h-3.5 w-3.5 border-r border-t border-gold/60" />
+            <div className="pointer-events-none absolute bottom-2.5 left-2.5 z-20 h-3.5 w-3.5 border-b border-l border-gold/60" />
+            <div className="pointer-events-none absolute bottom-2.5 right-2.5 z-20 h-3.5 w-3.5 border-b border-r border-gold/60" />
 
+            <div className="relative overflow-hidden border border-line/60 bg-[radial-gradient(120%_80%_at_50%_0%,#51145F_0%,#3B1048_45%,#26082F_100%)] px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
+              
               {/* Top Bar inside Screen */}
               <div className="flex items-center justify-between" aria-hidden>
                 <div className="flex items-center gap-2">
-                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-cream">
+                  <span className="grid h-8 w-8 place-items-center border border-line bg-white/5 text-cream">
                     <ChevronLeft size={16} />
                   </span>
-                  <span className="text-[11px] font-medium tracking-wider text-gold-champagne/90 uppercase">
+                  <span className="text-[11px] font-medium tracking-[0.18em] text-gold-champagne uppercase">
                     3D Bite Architecture
                   </span>
                 </div>
-                <div className="relative flex items-center gap-1.5 rounded-full border border-gold/30 bg-black/40 px-2.5 py-1 text-white">
+                <div className="relative flex items-center gap-2 border border-line bg-black/50 px-2.5 py-1 text-white">
                   <LogoMark className="h-4 w-auto" />
-                  <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_6px_#D4AF6A]" />
+                  <span className="h-1.5 w-1.5 bg-gold shadow-[0_0_6px_#D4AF6A]" />
                 </div>
               </div>
 
-              <p className="mt-3 text-[20px] font-light leading-[1.05] tracking-tight2 text-cream sm:text-[24px]">
+              <p className="mt-4 text-[20px] font-light leading-[1.05] tracking-tight2 text-cream sm:text-[24px]">
                 Treatment Plan <span className="text-gold-champagne">Overview</span>
               </p>
 
@@ -276,9 +279,14 @@ export function TreatmentMap() {
             </div>
           </div>
 
-          {/* ── Round Button Arch Console (Positioned Below Screen) ── */}
-          <div className="relative mt-5 w-full max-w-[460px] rounded-3xl border border-gold/30 bg-gradient-to-b from-[#3B1048]/90 via-[#26082F]/95 to-[#1a0421] p-4 sm:p-5 shadow-royal backdrop-blur-xl">
-            
+          {/* ── Round Button Arch Console (Square Outer Frame + Gold Corner Brackets) ── */}
+          <div className="relative mt-5 w-full max-w-[460px] border border-line bg-surface/90 p-4 sm:p-5 shadow-[0_0_30px_rgba(81,20,95,0.3)]">
+            {/* Gold architectural corner brackets */}
+            <div className="pointer-events-none absolute left-2.5 top-2.5 z-20 h-3 w-3 border-l border-t border-gold/50" />
+            <div className="pointer-events-none absolute right-2.5 top-2.5 z-20 h-3 w-3 border-r border-t border-gold/50" />
+            <div className="pointer-events-none absolute bottom-2.5 left-2.5 z-20 h-3 w-3 border-b border-l border-gold/50" />
+            <div className="pointer-events-none absolute bottom-2.5 right-2.5 z-20 h-3 w-3 border-b border-r border-gold/50" />
+
             {/* Curved Arch Guideline Motif */}
             <svg
               className="pointer-events-none absolute inset-x-3 top-[56px] h-10 w-[calc(100%-1.5rem)] overflow-visible"
@@ -304,14 +312,14 @@ export function TreatmentMap() {
 
             {/* Console Header Cue with Touch Indicator */}
             <div className="mb-3.5 flex items-center justify-between px-1">
-              <div className="flex items-center gap-2 text-[11px] font-semibold tracking-wider uppercase text-gold-champagne">
+              <div className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-gold-champagne">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-gold shadow-[0_0_8px_#D4AF6A]" />
                 </span>
                 <span>Touch to switch treatment</span>
               </div>
-              <span className="rounded-full border border-gold/25 bg-gold/10 px-2.5 py-0.5 text-[10px] font-medium text-gold-champagne">
+              <span className="border border-line bg-gold/10 px-2.5 py-0.5 text-[10px] font-medium tracking-wider uppercase text-gold-champagne">
                 5 Procedures
               </span>
             </div>
@@ -367,16 +375,22 @@ export function TreatmentMap() {
           </div>
         </div>
 
-        {/* 3 · Treatment Details Card (Simplified: No WhatsApp Button) */}
+        {/* 3 · Treatment Details Card (Square Corners & 1px Hairlines per SKILL.md) */}
         <div className="lg:col-span-5 lg:row-start-2" data-reveal>
           <div
             key={cat.id}
-            className="tm-rise rounded-2xl border border-line-strong bg-glass-card/90 p-5 shadow-royal backdrop-blur-xl sm:p-7"
+            className="tm-rise relative border border-line bg-surface/90 p-6 sm:p-8 transition-colors duration-500 hover:bg-royal/40"
             aria-live="polite"
           >
+            {/* Gold architectural corner brackets */}
+            <div className="pointer-events-none absolute left-3 top-3 z-20 h-3.5 w-3.5 border-l border-t border-gold/60" />
+            <div className="pointer-events-none absolute right-3 top-3 z-20 h-3.5 w-3.5 border-r border-t border-gold/60" />
+            <div className="pointer-events-none absolute bottom-3 left-3 z-20 h-3.5 w-3.5 border-b border-l border-gold/60" />
+            <div className="pointer-events-none absolute bottom-3 right-3 z-20 h-3.5 w-3.5 border-b border-r border-gold/60" />
+
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[19px] font-medium leading-snug text-cream">{cat.name}</p>
-              <span className="shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11px] font-medium text-gold-champagne">
+              <p className="text-[20px] font-normal leading-snug tracking-tight2 text-cream">{cat.name}</p>
+              <span className="shrink-0 border border-line bg-gold/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
                 {count} {count === 1 ? "area" : "areas"} mapped
               </span>
             </div>
@@ -384,23 +398,23 @@ export function TreatmentMap() {
             <p className="mt-3 text-[14px] leading-[1.65] text-muted">{cat.text}</p>
 
             {/* Clinical Roadmap Steps */}
-            <div className="mt-5 border-t border-line/40 pt-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gold-champagne">
+            <div className="mt-6 border-t border-line/60 pt-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-champagne">
                 Clinical Workflow
               </p>
               <ol className="mt-3 space-y-2">
                 {cat.steps.map(([title, tag], i) => (
                   <li
                     key={title}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-line/40 bg-black/45 px-3.5 py-2 text-[12px]"
+                    className="flex items-center justify-between gap-3 border border-line bg-black/40 px-4 py-2.5 text-[12px]"
                   >
-                    <span className="flex items-center gap-2 text-cream font-medium">
-                      <span className="text-gold-champagne font-semibold text-[11px]">0{i + 1}</span>
+                    <span className="flex items-center gap-2.5 text-cream font-medium">
+                      <span className="text-gold-champagne font-semibold text-[11px] tabular-nums tracking-wider">0{i + 1}</span>
                       {title}
                     </span>
                     <span
-                      className={`rounded px-2 py-0.5 text-[10px] font-medium ${
-                        i === 0 ? "bg-gold/20 text-gold-champagne" : "bg-white/10 text-muted"
+                      className={`border border-line/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
+                        i === 0 ? "bg-gold/20 text-gold-champagne" : "bg-white/5 text-muted"
                       }`}
                     >
                       {tag}
@@ -410,7 +424,7 @@ export function TreatmentMap() {
               </ol>
             </div>
 
-            <p className="mt-4 border-t border-line/40 pt-3 text-[11px] leading-relaxed text-muted/70">
+            <p className="mt-5 border-t border-line/40 pt-3 text-[11px] leading-relaxed text-muted/70">
               * Illustration only. Not a diagnosis. Specific clinical recommendations are provided following an in-person examination by Dr. Pinky Varghese.
             </p>
           </div>
