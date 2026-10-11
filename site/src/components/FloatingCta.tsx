@@ -63,7 +63,7 @@ export function FloatingCta() {
         }`}
         style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
       >
-        <BookButton className="btn-primary h-12 w-full text-[15px] font-medium flex items-center justify-center gap-2 shadow-[0_8px_30px_rgba(26,4,33,0.85)] rounded-full border border-gold/40">
+        <BookButton className="btn-primary h-12 w-full text-[15px] font-medium flex items-center justify-center gap-2 shadow-[0_8px_30px_rgba(26,4,33,0.85)]  border border-gold/40">
           <MessageCircle size={18} aria-hidden />
           Book Appointment
         </BookButton>
