@@ -176,11 +176,6 @@ export function TreatmentMap() {
         >
           {/* Architectural Screen Frame with 1px hairlines & square corners */}
           <div className="relative -mx-5 w-[calc(100%+2.5rem)] sm:mx-0 sm:w-full sm:max-w-[460px] border-y border-line bg-surface/90 sm:border sm:border-line p-4 sm:p-6 shadow-[0_0_40px_rgba(81,20,95,0.35)]">
-            {/* Gold architectural corner brackets */}
-            <div className="pointer-events-none absolute left-2.5 top-2.5 z-20 h-3.5 w-3.5 border-l border-t border-gold/60" />
-            <div className="pointer-events-none absolute right-2.5 top-2.5 z-20 h-3.5 w-3.5 border-r border-t border-gold/60" />
-            <div className="pointer-events-none absolute bottom-2.5 left-2.5 z-20 h-3.5 w-3.5 border-b border-l border-gold/60" />
-            <div className="pointer-events-none absolute bottom-2.5 right-2.5 z-20 h-3.5 w-3.5 border-b border-r border-gold/60" />
 
             <div className="relative overflow-hidden border border-line/60 bg-[radial-gradient(120%_80%_at_50%_0%,#51145F_0%,#3B1048_45%,#26082F_100%)] px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
               
@@ -281,11 +276,6 @@ export function TreatmentMap() {
 
           {/* ── Round Button Arch Console (Square Outer Frame + Gold Corner Brackets) ── */}
           <div className="relative mt-5 w-full max-w-[460px] border border-line bg-surface/90 p-4 sm:p-5 shadow-[0_0_30px_rgba(81,20,95,0.3)]">
-            {/* Gold architectural corner brackets */}
-            <div className="pointer-events-none absolute left-2.5 top-2.5 z-20 h-3 w-3 border-l border-t border-gold/50" />
-            <div className="pointer-events-none absolute right-2.5 top-2.5 z-20 h-3 w-3 border-r border-t border-gold/50" />
-            <div className="pointer-events-none absolute bottom-2.5 left-2.5 z-20 h-3 w-3 border-b border-l border-gold/50" />
-            <div className="pointer-events-none absolute bottom-2.5 right-2.5 z-20 h-3 w-3 border-b border-r border-gold/50" />
 
             {/* Curved Arch Guideline Motif */}
             <svg
@@ -382,11 +372,6 @@ export function TreatmentMap() {
             className="tm-rise relative border border-line bg-surface/90 p-6 sm:p-8 transition-colors duration-500 hover:bg-royal/40"
             aria-live="polite"
           >
-            {/* Gold architectural corner brackets */}
-            <div className="pointer-events-none absolute left-3 top-3 z-20 h-3.5 w-3.5 border-l border-t border-gold/60" />
-            <div className="pointer-events-none absolute right-3 top-3 z-20 h-3.5 w-3.5 border-r border-t border-gold/60" />
-            <div className="pointer-events-none absolute bottom-3 left-3 z-20 h-3.5 w-3.5 border-b border-l border-gold/60" />
-            <div className="pointer-events-none absolute bottom-3 right-3 z-20 h-3.5 w-3.5 border-b border-r border-gold/60" />
 
             <div className="flex items-center justify-between gap-3">
               <p className="text-[20px] font-normal leading-snug tracking-tight2 text-cream">{cat.name}</p>
